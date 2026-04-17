@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">Gin Web App</h1>
+            <ul class="nav-links">
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/contacts">View Contacts</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="hero">
+            <h1>Hello, World!</h1>
+            <p class="subtitle">Welcome to the Gin Framework Web Application</p>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🧮</div>
+                <h3>Calculator</h3>
+                <p>Perform basic arithmetic operations with our simple calculator.</p>
+                <a href="/calculator" class="btn btn-primary">Try Calculator</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Contact Form</h3>
+                <p>Submit your contact information and we'll store it in our database.</p>
+                <a href="/contact" class="btn btn-primary">Add Contact</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>View Contacts</h3>
+                <p>Browse all contacts stored in the PostgreSQL database.</p>
+                <a href="/contacts" class="btn btn-primary">View All</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Gin Web App. Built with Go and Gin Framework.</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">Gin Web App</h1>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/contacts" class="active">View Contacts</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="contacts-container">
+            <h1>Contacts List</h1>
+            <p class="subtitle">All contacts stored in the database</p>
+
+            {{ if .error }}
+            <div class="alert alert-error">{{ .error }}</div>
+            {{ end }}
+
+            {{ if .contacts }}
+                {{ if gt (len .contacts) 0 }}
+                <div class="table-container">
+                    <table class="contacts-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Email</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ range .contacts }}
+                            <tr>
+                                <td>{{ .ID }}</td>
+                                <td>{{ .Name }}</td>
+                                <td>{{ .Surname }}</td>
+                                <td>{{ .Email }}</td>
+                                <td>{{ .CreatedAt.Format "2006-01-02 15:04:05" }}</td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+                {{ else }}
+                <div class="alert alert-info">
+                    No contacts found. <a href="/contact">Add your first contact</a>
+                </div>
+                {{ end }}
+            {{ else }}
+            <div class="alert alert-info">
+                No contacts found. <a href="/contact">Add your first contact</a>
+            </div>
+            {{ end }}
+
+            <div class="back-link">
+                <a href="/">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Gin Web App. Built with Go and Gin Framework.</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">Gin Web App</h1>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/calculator" class="active">Calculator</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/contacts">View Contacts</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="form-container">
+            <h1>Calculator</h1>
+            <p class="subtitle">Perform basic arithmetic operations</p>
+
+            {{ if .error }}
+            <div class="alert alert-error">{{ .error }}</div>
+            {{ end }}
+
+            {{ if .result }}
+            <div class="alert alert-success">
+                Result: <strong>{{ .result }}</strong>
+            </div>
+            {{ end }}
+
+            <form method="POST" action="/calculator" class="calculator-form">
+                <div class="form-group">
+                    <label for="num1">First Number:</label>
+                    <input type="number" id="num1" name="num1" step="any" required 
+                           value="{{ .num1 }}" placeholder="Enter first number">
+                </div>
+
+                <div class="form-group">
+                    <label for="operation">Operation:</label>
+                    <select id="operation" name="operation" required>
+                        <option value="add">Addition (+)</option>
+                        <option value="subtract">Subtraction (-)</option>
+                        <option value="multiply">Multiplication (×)</option>
+                        <option value="divide">Division (÷)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="num2">Second Number:</label>
+                    <input type="number" id="num2" name="num2" step="any" required 
+                           value="{{ .num2 }}" placeholder="Enter second number">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Calculate</button>
+                <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear</button>
+            </form>
+
+            <div class="back-link">
+                <a href="/">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Gin Web App. Built with Go and Gin Framework.</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/calculator.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">Gin Web App</h1>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+                <li><a href="/contact" class="active">Contact</a></li>
+                <li><a href="/contacts">View Contacts</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="form-container">
+            <h1>Contact Form</h1>
+            <p class="subtitle">Submit your contact information</p>
+
+            {{ if .error }}
+            <div class="alert alert-error">{{ .error }}</div>
+            {{ end }}
+
+            {{ if .success }}
+            <div class="alert alert-success">{{ .success }}</div>
+            {{ end }}
+
+            <form method="POST" action="/contact" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required 
+                           placeholder="Enter your first name">
+                </div>
+
+                <div class="form-group">
+                    <label for="surname">Surname:</label>
+                    <input type="text" id="surname" name="surname" required 
+                           placeholder="Enter your last name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="Enter your email address">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </form>
+
+            <div class="back-link">
+                <a href="/">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Gin Web App. Built with Go and Gin Framework.</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/contact.js"></script>
+</body>
+</html>
