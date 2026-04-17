@@ -9,7 +9,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0d4d2d 0%, #1a5c3a 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -40,7 +40,7 @@ body {
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #667eea;
+    color: #2d7a4f;
 }
 
 .nav-links {
@@ -60,8 +60,8 @@ body {
 
 .nav-links a:hover,
 .nav-links a.active {
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
+    color: #2d7a4f;
+    background: rgba(45, 122, 79, 0.1);
 }
 
 /* Main Content */
@@ -117,7 +117,7 @@ body {
 }
 
 .feature-card h3 {
-    color: #667eea;
+    color: #2d7a4f;
     margin-bottom: 1rem;
 }
 
@@ -140,14 +140,14 @@ body {
 }
 
 .btn-primary {
-    background: #667eea;
+    background: #2d7a4f;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #5568d3;
+    background: #1a5c3a;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 5px 15px rgba(45, 122, 79, 0.3);
 }
 
 .btn-secondary {
@@ -171,7 +171,7 @@ body {
 }
 
 .form-container h1 {
-    color: #667eea;
+    color: #2d7a4f;
     margin-bottom: 0.5rem;
 }
 
@@ -199,7 +199,7 @@ body {
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #2d7a4f;
 }
 
 /* Alerts */
@@ -216,9 +216,9 @@ body {
 }
 
 .alert-success {
-    background: #efe;
-    color: #3c3;
-    border-left: 4px solid #3c3;
+    background: #e8f5e9;
+    color: #1a5c3a;
+    border-left: 4px solid #2d7a4f;
 }
 
 .alert-info {
@@ -243,7 +243,7 @@ body {
 }
 
 .contacts-table thead {
-    background: #667eea;
+    background: #2d7a4f;
     color: white;
 }
 
@@ -273,7 +273,7 @@ body {
 }
 
 .contacts-container h1 {
-    color: #667eea;
+    color: #2d7a4f;
     margin-bottom: 0.5rem;
 }
 
@@ -284,14 +284,14 @@ body {
 }
 
 .back-link a {
-    color: #667eea;
+    color: #2d7a4f;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 .back-link a:hover {
-    color: #5568d3;
+    color: #1a5c3a;
 }
 
 /* Footer */
