@@ -22,7 +22,6 @@ func main() {
 
 	// Serve static files
 	router.Static("/static/css", "./static/css")
-	router.Static("/static/js", "./static/js")
 
 	// Initialize handlers
 	h := handlers.NewHandler(db)
@@ -44,7 +43,7 @@ func main() {
 	log.Printf("Starting server on port %s...", port)
 	log.Println("No database setup required - using in-memory storage")
 	log.Printf("Access the application at http://localhost:%s", port)
-	
+
 	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
