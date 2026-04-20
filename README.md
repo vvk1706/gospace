@@ -1,4 +1,4 @@
-# Gin Web Application
+# GoSpace
 
 A comprehensive web application built with Go and the Gin framework, featuring a calculator, contact form with in-memory database storage, and a modern responsive UI.
 
@@ -193,7 +193,7 @@ The application supports the following environment variables (see [`.env.example
 | DB_PORT | PostgreSQL port | 5432 | Only if using PostgreSQL |
 | DB_USER | PostgreSQL user | postgres | Only if using PostgreSQL |
 | DB_PASSWORD | PostgreSQL password | postgres | Only if using PostgreSQL |
-| DB_NAME | PostgreSQL database name | gin_webapp | Only if using PostgreSQL |
+| DB_NAME | PostgreSQL database name | gospace | Only if using PostgreSQL |
 | DB_SSLMODE | PostgreSQL SSL mode | disable | Only if using PostgreSQL |
 
 **Note**: Database environment variables are only needed if you switch from in-memory storage to PostgreSQL. By default, the application uses in-memory storage and only requires the PORT variable (which defaults to 8080).

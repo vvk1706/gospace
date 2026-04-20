@@ -31,8 +31,8 @@ func (h *Handler) SubmitContact(c *gin.Context) {
 
 	contact := models.NewContact(name, surname, email)
 
-	// Save contact to database
-	if err := h.DB.CreateContact(contact); err != nil {
+	// Save contact to database using GORM
+	if err := h.DB.Create(contact).Error; err != nil {
 		c.HTML(http.StatusInternalServerError, "contact.html", gin.H{
 			"title": "Contact Form",
 			"error": "Failed to save contact. Email might already exist.",
@@ -48,8 +48,8 @@ func (h *Handler) SubmitContact(c *gin.Context) {
 
 // ListContacts handles listing all contacts
 func (h *Handler) ListContacts(c *gin.Context) {
-	contacts, err := h.DB.GetAllContacts()
-	if err != nil {
+	var contacts []models.Contact
+	if err := h.DB.Find(&contacts).Error; err != nil {
 		c.HTML(http.StatusInternalServerError, "contacts_list.html", gin.H{
 			"title": "Contacts List",
 			"error": "Failed to retrieve contacts",

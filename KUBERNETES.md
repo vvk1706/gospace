@@ -1,6 +1,6 @@
 # Kubernetes Deployment Guide
 
-This guide explains how to deploy the Gin Web Application to Kubernetes using Rancher Desktop or any Kubernetes cluster.
+This guide explains how to deploy GoSpace to Kubernetes using Rancher Desktop or any Kubernetes cluster.
 
 ## Overview
 

@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-This guide will help you get the Gin Web Application up and running in **under 2 minutes**.
+This guide will help you get GoSpace up and running in **under 2 minutes**.
 
 ## Prerequisites
 

@@ -1,6 +1,6 @@
 # API Documentation
 
-This document describes all available API endpoints in the Gin Web Application.
+This document describes all available API endpoints in GoSpace.
 
 ## Endpoints
 

@@ -1,6 +1,6 @@
 # Documentation Index
 
-This document provides an overview of all documentation available for the Gin Web Application project.
+This document provides an overview of all documentation available for the GoSpace project.
 
 ## Quick Links
 
@@ -11,7 +11,7 @@ This document provides an overview of all documentation available for the Gin We
 
 ## Project Overview
 
-The Gin Web Application is a comprehensive web application built with Go and the Gin framework. It features:
+GoSpace is a comprehensive web application built with Go and the Gin framework. It features:
 - Calculator functionality
 - Contact form with in-memory database storage
 - Modern responsive UI

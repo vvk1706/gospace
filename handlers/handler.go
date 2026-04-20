@@ -1,16 +1,16 @@
 package handlers
 
 import (
-	"github.com/user/gospace/config"
+	"gorm.io/gorm"
 )
 
 // Handler holds dependencies for HTTP handlers
 type Handler struct {
-	DB *config.MockDB
+	DB *gorm.DB
 }
 
 // NewHandler creates a new Handler instance
-func NewHandler(db *config.MockDB) *Handler {
+func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{
 		DB: db,
 	}
