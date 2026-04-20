@@ -3,7 +3,10 @@ package tests
 import (
 	"testing"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	csrf "github.com/utrack/gin-csrf"
 	"github.com/user/gospace/handlers"
 	"github.com/user/gospace/models"
 	"gorm.io/driver/sqlite"
@@ -30,6 +33,17 @@ func setupTestDB(t *testing.T) *gorm.DB {
 func setupRouter(db *gorm.DB) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
+	
+	// Setup session store for CSRF protection in tests
+	store := cookie.NewStore([]byte("test-secret"))
+	router.Use(sessions.Sessions("test_session", store))
+	
+	// Add CSRF protection middleware (skip validation in tests)
+	router.Use(csrf.Middleware(csrf.Options{
+		Secret: "test-csrf-secret",
+		IgnoreMethods: []string{"GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"},
+	}))
+	
 	router.LoadHTMLGlob("../templates/*")
 
 	h := handlers.NewHandler(db)

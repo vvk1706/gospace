@@ -12,6 +12,8 @@ A comprehensive web application built with Go and the Gin framework, featuring a
 - **Responsive Design**: Modern, mobile-friendly UI
 - **No JavaScript**: Pure HTML/CSS with server-side rendering for maximum compatibility and security
 - **PostgreSQL Database**: Persistent storage with GORM ORM
+- **CSRF Protection**: All POST endpoints protected against cross-site request forgery attacks
+- **Session Management**: Secure session handling for CSRF tokens
 
 ## Project Structure
 

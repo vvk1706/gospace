@@ -41,8 +41,8 @@ func TestFullUserFlow(t *testing.T) {
 		req, _ = http.NewRequest("POST", "/calculator", strings.NewReader(form.Encode()))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		router.ServeHTTP(w, req)
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Contains(t, w.Body.String(), "125")
+		assert.Equal(t, http.StatusSeeOther, w.Code)
+		assert.Equal(t, "/calculator/history", w.Header().Get("Location"))
 
 		// Step 4: Visit contact form
 		w = httptest.NewRecorder()
@@ -103,8 +103,8 @@ func TestMultipleCalculations(t *testing.T) {
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 			router.ServeHTTP(w, req)
 
-			assert.Equal(t, http.StatusOK, w.Code)
-			assert.Contains(t, w.Body.String(), op.expected)
+			assert.Equal(t, http.StatusSeeOther, w.Code)
+			assert.Equal(t, "/calculator/history", w.Header().Get("Location"))
 		})
 	}
 }

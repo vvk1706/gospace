@@ -4,7 +4,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	csrf "github.com/utrack/gin-csrf"
 	"github.com/user/gospace/config"
 	"github.com/user/gospace/handlers"
 	"github.com/user/gospace/models"
@@ -29,6 +32,19 @@ func main() {
 
 	// Initialize Gin router
 	router := gin.Default()
+
+	// Setup session store for CSRF protection
+	store := cookie.NewStore([]byte(cfg.SessionSecret))
+	router.Use(sessions.Sessions("gospace_session", store))
+
+	// Add CSRF protection middleware
+	router.Use(csrf.Middleware(csrf.Options{
+		Secret: cfg.CSRFSecret,
+		ErrorFunc: func(c *gin.Context) {
+			c.String(400, "CSRF token mismatch")
+			c.Abort()
+		},
+	}))
 
 	// Load HTML templates
 	router.LoadHTMLGlob("templates/*")

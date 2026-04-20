@@ -46,38 +46,43 @@ func TestCalculatorPostHandler(t *testing.T) {
 		operation      string
 		expectedStatus int
 		shouldContain  string
+		expectRedirect bool
 	}{
 		{
 			name:           "Addition",
 			num1:           "10",
 			num2:           "5",
 			operation:      "add",
-			expectedStatus: http.StatusOK,
-			shouldContain:  "15",
+			expectedStatus: http.StatusSeeOther,
+			shouldContain:  "/calculator/history",
+			expectRedirect: true,
 		},
 		{
 			name:           "Subtraction",
 			num1:           "10",
 			num2:           "5",
 			operation:      "subtract",
-			expectedStatus: http.StatusOK,
-			shouldContain:  "5",
+			expectedStatus: http.StatusSeeOther,
+			shouldContain:  "/calculator/history",
+			expectRedirect: true,
 		},
 		{
 			name:           "Multiplication",
 			num1:           "10",
 			num2:           "5",
 			operation:      "multiply",
-			expectedStatus: http.StatusOK,
-			shouldContain:  "50",
+			expectedStatus: http.StatusSeeOther,
+			shouldContain:  "/calculator/history",
+			expectRedirect: true,
 		},
 		{
 			name:           "Division",
 			num1:           "10",
 			num2:           "5",
 			operation:      "divide",
-			expectedStatus: http.StatusOK,
-			shouldContain:  "2",
+			expectedStatus: http.StatusSeeOther,
+			shouldContain:  "/calculator/history",
+			expectRedirect: true,
 		},
 		{
 			name:           "Division by zero",
@@ -108,9 +113,13 @@ func TestCalculatorPostHandler(t *testing.T) {
 			req, _ := http.NewRequest("POST", "/calculator", strings.NewReader(form.Encode()))
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 			router.ServeHTTP(w, req)
-
+	
 			assert.Equal(t, tt.expectedStatus, w.Code)
-			assert.Contains(t, w.Body.String(), tt.shouldContain)
+			if tt.expectRedirect {
+				assert.Equal(t, tt.shouldContain, w.Header().Get("Location"))
+			} else {
+				assert.Contains(t, w.Body.String(), tt.shouldContain)
+			}
 		})
 	}
 }

@@ -1,5 +1,15 @@
 # API Documentation
 
+## Security
+
+### CSRF Protection
+All POST endpoints are protected with CSRF (Cross-Site Request Forgery) tokens. Each form must include a hidden `_csrf` field with a valid token obtained from the server. The CSRF middleware validates tokens on all POST requests.
+
+**Configuration:**
+- Session secret: Set via `SESSION_SECRET` environment variable
+- CSRF secret: Set via `CSRF_SECRET` environment variable
+- Both should be changed from defaults in production
+
 This document describes all available API endpoints in GoSpace.
 
 ## Endpoints
@@ -31,10 +41,12 @@ This document describes all available API endpoints in GoSpace.
   - `num1` (required): First number (float64)
   - `num2` (required): Second number (float64)
   - `operation` (required): Operation type (`add`, `subtract`, `multiply`, `divide`)
-- **Response**: Redirect to `/calculator/history` after saving calculation
+  - `_csrf` (required): CSRF token for form protection
+- **Response**: `303 See Other` - Redirects to `/calculator/history` after successful calculation
 - **Error Responses**:
   - `400 Bad Request`: Invalid numbers or operation
   - `400 Bad Request`: Division by zero (when operation is `divide` and num2 is 0)
+  - `400 Bad Request`: CSRF token mismatch
   - `500 Internal Server Error`: Database error
 
 #### Get Calculator History
@@ -54,9 +66,11 @@ This document describes all available API endpoints in GoSpace.
 - **Handler**: [`handlers.DeleteCalculatorHistory`](handlers/calculator.go:80)
 - **Parameters**:
   - `id` (required): Calculation ID (uint, URL parameter)
-- **Response**: Redirect to `/calculator/history`
+  - `_csrf` (required): CSRF token for form protection
+- **Response**: `303 See Other` - Redirects to `/calculator/history`
 - **Error Responses**:
   - `400 Bad Request`: Invalid ID format
+  - `400 Bad Request`: CSRF token mismatch
   - `404 Not Found`: Calculation not found
   - `500 Internal Server Error`: Database error
 
@@ -79,9 +93,11 @@ This document describes all available API endpoints in GoSpace.
   - `name` (required): First name (string)
   - `surname` (required): Last name (string)
   - `email` (required): Email address (string, must be unique)
+  - `_csrf` (required): CSRF token for form protection
 - **Response**: HTML page with success message
 - **Error Responses**:
   - `400 Bad Request`: Missing required fields
+  - `400 Bad Request`: CSRF token mismatch
   - `500 Internal Server Error`: Database error (e.g., duplicate email)
 
 #### List All Contacts
