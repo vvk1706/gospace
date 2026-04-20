@@ -1,12 +1,43 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/user/gospace/models"
 )
+
+// performCalculation performs a calculation based on the operation
+func performCalculation(num1, num2 float64, operation string) (float64, error) {
+	switch operation {
+	case "add":
+		return num1 + num2, nil
+	case "subtract":
+		return num1 - num2, nil
+	case "multiply":
+		return num1 * num2, nil
+	case "divide":
+		if num2 == 0 {
+			return 0, errors.New("cannot divide by zero")
+		}
+		return num1 / num2, nil
+	default:
+		return 0, errors.New("invalid operation")
+	}
+}
+
+// validateOperation checks if the operation is valid
+func validateOperation(operation string) bool {
+	validOps := map[string]bool{
+		"add":      true,
+		"subtract": true,
+		"multiply": true,
+		"divide":   true,
+	}
+	return validOps[operation]
+}
 
 // Calculator handles the calculator page request
 func (h *Handler) Calculator(c *gin.Context) {
@@ -32,36 +63,26 @@ func (h *Handler) CalculateResult(c *gin.Context) {
 		return
 	}
 
-	var result float64
-	var resultStr string
-
-	switch operation {
-	case "add":
-		result = num1 + num2
-		resultStr = strconv.FormatFloat(result, 'f', -1, 64)
-	case "subtract":
-		result = num1 - num2
-		resultStr = strconv.FormatFloat(result, 'f', -1, 64)
-	case "multiply":
-		result = num1 * num2
-		resultStr = strconv.FormatFloat(result, 'f', -1, 64)
-	case "divide":
-		if num2 == 0 {
-			c.HTML(http.StatusBadRequest, "calculator.html", gin.H{
-				"title": "Calculator",
-				"error": "Cannot divide by zero",
-			})
-			return
-		}
-		result = num1 / num2
-		resultStr = strconv.FormatFloat(result, 'f', -1, 64)
-	default:
+	// Validate operation
+	if !validateOperation(operation) {
 		c.HTML(http.StatusBadRequest, "calculator.html", gin.H{
 			"title": "Calculator",
 			"error": "Invalid operation",
 		})
 		return
 	}
+
+	// Perform calculation
+	result, err := performCalculation(num1, num2, operation)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "calculator.html", gin.H{
+			"title": "Calculator",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	resultStr := strconv.FormatFloat(result, 'f', -1, 64)
 
 	// Save calculation to history
 	history := models.NewCalculatorHistory(num1, num2, operation, result)
@@ -104,10 +125,34 @@ func (h *Handler) ListCalculatorHistory(c *gin.Context) {
 
 // DeleteCalculatorHistory handles deleting a calculator history record
 func (h *Handler) DeleteCalculatorHistory(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
 	
-	if err := h.DB.Delete(&models.CalculatorHistory{}, id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete history"})
+	// Validate ID is a valid integer
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": "Invalid ID provided",
+		})
+		return
+	}
+
+	// Delete the record and check if it existed
+	result := h.DB.Delete(&models.CalculatorHistory{}, id)
+	if result.Error != nil {
+		c.HTML(http.StatusInternalServerError, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": "Failed to delete history",
+		})
+		return
+	}
+
+	// Check if any rows were affected
+	if result.RowsAffected == 0 {
+		c.HTML(http.StatusNotFound, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": "Record not found",
+		})
 		return
 	}
 
@@ -116,8 +161,18 @@ func (h *Handler) DeleteCalculatorHistory(c *gin.Context) {
 
 // EditCalculatorHistory handles updating a calculator history record
 func (h *Handler) EditCalculatorHistory(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
 	
+	// Validate ID is a valid integer
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": "Invalid ID provided",
+		})
+		return
+	}
+
 	num1Str := c.PostForm("num1")
 	num2Str := c.PostForm("num2")
 	operation := c.PostForm("operation")
@@ -126,37 +181,54 @@ func (h *Handler) EditCalculatorHistory(c *gin.Context) {
 	num2, err2 := strconv.ParseFloat(num2Str, 64)
 
 	if err1 != nil || err2 != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid numbers provided"})
+		c.HTML(http.StatusBadRequest, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": "Invalid numbers provided",
+		})
 		return
 	}
 
-	var result float64
-	switch operation {
-	case "add":
-		result = num1 + num2
-	case "subtract":
-		result = num1 - num2
-	case "multiply":
-		result = num1 * num2
-	case "divide":
-		if num2 == 0 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot divide by zero"})
-			return
-		}
-		result = num1 / num2
-	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid operation"})
+	// Validate operation
+	if !validateOperation(operation) {
+		c.HTML(http.StatusBadRequest, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": "Invalid operation",
+		})
 		return
 	}
 
-	// Update the history record
-	if err := h.DB.Model(&models.CalculatorHistory{}).Where("id = ?", id).Updates(map[string]interface{}{
+	// Perform calculation
+	result, err := performCalculation(num1, num2, operation)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// Update the history record and check if it existed
+	updateResult := h.DB.Model(&models.CalculatorHistory{}).Where("id = ?", id).Updates(map[string]interface{}{
 		"num1":      num1,
 		"num2":      num2,
 		"operation": operation,
 		"result":    result,
-	}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update history"})
+	})
+
+	if updateResult.Error != nil {
+		c.HTML(http.StatusInternalServerError, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": "Failed to update history",
+		})
+		return
+	}
+
+	// Check if any rows were affected
+	if updateResult.RowsAffected == 0 {
+		c.HTML(http.StatusNotFound, "calculator_history.html", gin.H{
+			"title": "Calculator History",
+			"error": "Record not found",
+		})
 		return
 	}
 

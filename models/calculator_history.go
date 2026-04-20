@@ -11,6 +11,7 @@ type CalculatorHistory struct {
 	Num2      float64   `json:"num2"`
 	Operation string    `json:"operation"`
 	Result    float64   `json:"result"`
+	Version   int       `gorm:"default:0" json:"version"` // For optimistic locking
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

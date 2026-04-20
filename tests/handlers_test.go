@@ -7,38 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/user/gospace/config"
-	"github.com/user/gospace/handlers"
 	"github.com/user/gospace/models"
 )
 
-// setupTestDB creates a mock database for testing
-func setupTestDB() *config.MockDB {
-	return config.NewMockDB()
-}
-
-// setupRouter creates a test router with handlers
-func setupRouter(db *config.MockDB) *gin.Engine {
-	gin.SetMode(gin.TestMode)
-	router := gin.Default()
-	router.LoadHTMLGlob("../templates/*")
-
-	h := handlers.NewHandler(db)
-
-	router.GET("/", h.Home)
-	router.GET("/calculator", h.Calculator)
-	router.POST("/calculator", h.CalculateResult)
-	router.GET("/contact", h.ContactForm)
-	router.POST("/contact", h.SubmitContact)
-	router.GET("/contacts", h.ListContacts)
-
-	return router
-}
-
 func TestHomeHandler(t *testing.T) {
-	db := setupTestDB()
+	db := setupTestDB(t)
 	router := setupRouter(db)
 
 	w := httptest.NewRecorder()
@@ -50,7 +24,7 @@ func TestHomeHandler(t *testing.T) {
 }
 
 func TestCalculatorGetHandler(t *testing.T) {
-	db := setupTestDB()
+	db := setupTestDB(t)
 	router := setupRouter(db)
 
 	w := httptest.NewRecorder()
@@ -62,7 +36,7 @@ func TestCalculatorGetHandler(t *testing.T) {
 }
 
 func TestCalculatorPostHandler(t *testing.T) {
-	db := setupTestDB()
+	db := setupTestDB(t)
 	router := setupRouter(db)
 
 	tests := []struct {
@@ -111,7 +85,7 @@ func TestCalculatorPostHandler(t *testing.T) {
 			num2:           "0",
 			operation:      "divide",
 			expectedStatus: http.StatusBadRequest,
-			shouldContain:  "Cannot divide by zero",
+			shouldContain:  "cannot divide by zero",
 		},
 		{
 			name:           "Invalid number",
@@ -142,7 +116,7 @@ func TestCalculatorPostHandler(t *testing.T) {
 }
 
 func TestContactFormGetHandler(t *testing.T) {
-	db := setupTestDB()
+	db := setupTestDB(t)
 	router := setupRouter(db)
 
 	w := httptest.NewRecorder()
@@ -154,7 +128,7 @@ func TestContactFormGetHandler(t *testing.T) {
 }
 
 func TestContactFormPostHandler(t *testing.T) {
-	db := setupTestDB()
+	db := setupTestDB(t)
 	router := setupRouter(db)
 
 	tests := []struct {
@@ -203,11 +177,11 @@ func TestContactFormPostHandler(t *testing.T) {
 }
 
 func TestListContactsHandler(t *testing.T) {
-	db := setupTestDB()
+	db := setupTestDB(t)
 
 	// Add test contacts
-	db.CreateContact(models.NewContact("John", "Doe", "john@example.com"))
-	db.CreateContact(models.NewContact("Jane", "Smith", "jane@example.com"))
+	db.Create(models.NewContact("John", "Doe", "john@example.com"))
+	db.Create(models.NewContact("Jane", "Smith", "jane@example.com"))
 
 	router := setupRouter(db)
 
@@ -223,7 +197,11 @@ func TestListContactsHandler(t *testing.T) {
 }
 
 func TestDuplicateEmailContact(t *testing.T) {
-	db := setupTestDB()
+	db := setupTestDB(t)
+	
+	// Add unique constraint to email field for this test
+	db.Exec("CREATE UNIQUE INDEX idx_contacts_email ON contacts(email)")
+	
 	router := setupRouter(db)
 
 	// First submission
