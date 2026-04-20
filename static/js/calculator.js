@@ -82,5 +82,3 @@ window.addEventListener('load', function() {
         form.appendChild(hint);
     }
 });
-
-// Made with Bob

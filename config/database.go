@@ -31,5 +31,3 @@ func InitDB(cfg *Config) (*gorm.DB, error) {
 
 	return db, nil
 }
-
-// Made with Bob

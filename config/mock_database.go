@@ -105,5 +105,3 @@ type NotFoundError struct {
 func (e *NotFoundError) Error() string {
 	return "contact not found"
 }
-
-// Made with Bob

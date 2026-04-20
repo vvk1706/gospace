@@ -15,5 +15,3 @@ func NewHandler(db *config.MockDB) *Handler {
 		DB: db,
 	}
 }
-
-// Made with Bob

@@ -12,5 +12,3 @@ func (h *Handler) Home(c *gin.Context) {
 		"title": "Hello, World!",
 	})
 }
-
-// Made with Bob

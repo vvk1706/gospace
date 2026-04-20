@@ -62,5 +62,3 @@ func (h *Handler) ListContacts(c *gin.Context) {
 		"contacts": contacts,
 	})
 }
-
-// Made with Bob

@@ -248,5 +248,3 @@ func TestDuplicateEmailContact(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	assert.Contains(t, w.Body.String(), "Failed to save contact")
 }
-
-// Made with Bob

@@ -30,5 +30,3 @@ func NewContact(name, surname, email string) *Contact {
 func (Contact) TableName() string {
 	return "contacts"
 }
-
-// Made with Bob

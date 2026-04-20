@@ -69,5 +69,3 @@ func (h *Handler) CalculateResult(c *gin.Context) {
 		"num2":   num2Str,
 	})
 }
-
-// Made with Bob

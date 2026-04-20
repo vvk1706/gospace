@@ -239,5 +239,3 @@ func TestConcurrentRequests(t *testing.T) {
 
 	assert.Equal(t, 10, successCount, "All concurrent requests should succeed")
 }
-
-// Made with Bob
