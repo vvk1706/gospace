@@ -35,7 +35,6 @@ func main() {
 
 	// Serve static files
 	router.Static("/static/css", "./static/css")
-	router.Static("/static/js", "./static/js")
 
 	// Initialize handlers
 	h := handlers.NewHandler(db)
@@ -46,7 +45,6 @@ func main() {
 	router.POST("/calculator", h.CalculateResult)
 	router.GET("/calculator/history", h.ListCalculatorHistory)
 	router.POST("/calculator/history/:id/delete", h.DeleteCalculatorHistory)
-	router.POST("/calculator/history/:id/edit", h.EditCalculatorHistory)
 	router.GET("/contact", h.ContactForm)
 	router.POST("/contact", h.SubmitContact)
 	router.GET("/contacts", h.ListContacts)

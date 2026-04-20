@@ -44,18 +44,17 @@
                     </thead>
                     <tbody>
                         {{ range .history }}
-                        <tr id="row-{{ .ID }}">
+                        <tr>
                             <td>{{ .ID }}</td>
-                            <td class="editable" data-field="num1">{{ .Num1 }}</td>
-                            <td class="editable" data-field="operation">{{ .Operation }}</td>
-                            <td class="editable" data-field="num2">{{ .Num2 }}</td>
+                            <td>{{ .Num1 }}</td>
+                            <td>{{ .Operation }}</td>
+                            <td>{{ .Num2 }}</td>
                             <td>{{ .Result }}</td>
                             <td>{{ .CreatedAt.Format "2006-01-02 15:04:05" }}</td>
                             <td class="action-buttons">
-                                <button class="btn btn-edit" onclick="editRow({{ .ID }})">Edit</button>
-                                <button class="btn btn-delete" onclick="deleteRow({{ .ID }})">Delete</button>
-                                <button class="btn btn-save" id="save-{{ .ID }}" style="display:none;" onclick="saveRow({{ .ID }})">Save</button>
-                                <button class="btn btn-cancel" id="cancel-{{ .ID }}" style="display:none;" onclick="cancelEdit({{ .ID }})">Cancel</button>
+                                <form method="POST" action="/calculator/history/{{ .ID }}/delete" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this calculation?');">
+                                    <button type="submit" class="btn btn-delete">Delete</button>
+                                </form>
                             </td>
                         </tr>
                         {{ end }}
@@ -72,97 +71,5 @@
         </div>
     </div>
 
-    <script>
-        let originalValues = {};
-
-        function editRow(id) {
-            const row = document.getElementById(`row-${id}`);
-            const editables = row.querySelectorAll('.editable');
-            
-            // Store original values
-            originalValues[id] = {};
-            editables.forEach(cell => {
-                const field = cell.dataset.field;
-                originalValues[id][field] = cell.textContent;
-                
-                if (field === 'operation') {
-                    const select = document.createElement('select');
-                    select.className = 'form-input';
-                    select.innerHTML = `
-                        <option value="add" ${cell.textContent === 'add' ? 'selected' : ''}>add</option>
-                        <option value="subtract" ${cell.textContent === 'subtract' ? 'selected' : ''}>subtract</option>
-                        <option value="multiply" ${cell.textContent === 'multiply' ? 'selected' : ''}>multiply</option>
-                        <option value="divide" ${cell.textContent === 'divide' ? 'selected' : ''}>divide</option>
-                    `;
-                    cell.innerHTML = '';
-                    cell.appendChild(select);
-                } else {
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.step = 'any';
-                    input.value = cell.textContent;
-                    input.className = 'form-input';
-                    cell.innerHTML = '';
-                    cell.appendChild(input);
-                }
-            });
-
-            // Toggle buttons
-            row.querySelector('.btn-edit').style.display = 'none';
-            row.querySelector('.btn-delete').style.display = 'none';
-            document.getElementById(`save-${id}`).style.display = 'inline-block';
-            document.getElementById(`cancel-${id}`).style.display = 'inline-block';
-        }
-
-        function cancelEdit(id) {
-            const row = document.getElementById(`row-${id}`);
-            const editables = row.querySelectorAll('.editable');
-            
-            // Restore original values
-            editables.forEach(cell => {
-                const field = cell.dataset.field;
-                cell.textContent = originalValues[id][field];
-            });
-
-            // Toggle buttons
-            row.querySelector('.btn-edit').style.display = 'inline-block';
-            row.querySelector('.btn-delete').style.display = 'inline-block';
-            document.getElementById(`save-${id}`).style.display = 'none';
-            document.getElementById(`cancel-${id}`).style.display = 'none';
-        }
-
-        function saveRow(id) {
-            const row = document.getElementById(`row-${id}`);
-            const num1 = row.querySelector('[data-field="num1"] input').value;
-            const num2 = row.querySelector('[data-field="num2"] input').value;
-            const operation = row.querySelector('[data-field="operation"] select').value;
-
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/calculator/history/${id}/edit`;
-            
-            const fields = {num1, num2, operation};
-            for (const [key, value] of Object.entries(fields)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
-            }
-            
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        function deleteRow(id) {
-            if (confirm('Are you sure you want to delete this calculation?')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/calculator/history/${id}/delete`;
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-    </script>
 </body>
 </html>

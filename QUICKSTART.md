@@ -7,7 +7,7 @@ This guide will help you get GoSpace up and running in **under 2 minutes**.
 - Go 1.21 or higher installed
 - Git
 
-**No database required!** The application uses in-memory storage.
+**Database required:** The application uses PostgreSQL for persistent storage.
 
 ## Quick Setup (2 minutes)
 
@@ -18,23 +18,46 @@ git clone <repository-url>
 cd gospace
 ```
 
-### 2. Install Dependencies
+### 2. Set Up Database
 
+You have three options:
+
+**Option A: Docker Compose (Recommended)**
 ```bash
-go mod download
+# Start PostgreSQL and application
+docker-compose up -d
+
+# Access at http://localhost:8080
 ```
 
-### 3. Run the Application
-
+**Option B: Local PostgreSQL**
 ```bash
+# Install PostgreSQL, then create database
+createdb gospace
+
+# Copy environment file
+cp .env.example .env
+
+# Edit .env with your database credentials
+# Then install dependencies and run
+go mod download
+go run main.go
+```
+
+**Option C: Use SQLite (Development Only)**
+```bash
+# Modify config/database.go to use SQLite
+# Then run
+go mod download
 go run main.go
 ```
 
 You should see:
 ```
-Using in-memory mock database (no PostgreSQL required)
+Connected to PostgreSQL database
+Database migration completed
 Starting server on port 8080...
-No database setup required - using in-memory storage
+Using PostgreSQL database for persistent storage
 Access the application at http://localhost:8080
 ```
 
@@ -55,6 +78,8 @@ Open your browser and go to `http://localhost:8080`
 - Enter two numbers (e.g., 10 and 5)
 - Select an operation (add, subtract, multiply, divide)
 - Click "Calculate" to see the result
+- View calculation history at `http://localhost:8080/calculator/history`
+- Delete past calculations from the history page
 
 ### 3. Contact Form
 - Click "Add Contact" or go to `http://localhost:8080/contact`
@@ -69,7 +94,7 @@ Open your browser and go to `http://localhost:8080`
 - Click "View All" or go to `http://localhost:8080/contacts`
 - See all contacts stored in memory
 
-**Note**: Data is stored in memory and will be cleared when you restart the application.
+**Note**: Data is stored in PostgreSQL and persists across application restarts.
 
 ## Running Tests
 
@@ -133,18 +158,19 @@ docker run -p 8080:8080 gospace
 
 ## Key Features
 
-✅ **Zero Configuration** - No database setup required  
-✅ **Fast Startup** - Application starts in seconds  
-✅ **Complete Functionality** - Calculator, forms, and data storage  
-✅ **Modern UI** - Responsive design with animations  
-✅ **Fully Tested** - Comprehensive test suite included  
+✅ **PostgreSQL Database** - Persistent data storage with GORM
+✅ **Fast Startup** - Application starts in seconds
+✅ **Complete Functionality** - Calculator with history, forms, and data storage
+✅ **Modern UI** - Responsive design with pure HTML/CSS (no JavaScript)
+✅ **Fully Tested** - Comprehensive test suite with 31 passing tests
 
-## What's Stored in Memory?
+## What's Stored in Database?
 
 - Contact records (name, surname, email)
+- Calculator history (operations and results)
 - Automatic ID generation
 - Duplicate email validation
-- Thread-safe operations
+- Optimistic locking for concurrent updates
 
 ## Next Steps
 

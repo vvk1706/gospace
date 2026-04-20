@@ -1,15 +1,17 @@
 # GoSpace
 
-A comprehensive web application built with Go and the Gin framework, featuring a calculator, contact form with in-memory database storage, and a modern responsive UI.
+A comprehensive web application built with Go and the Gin framework, featuring a calculator with history tracking, contact form with PostgreSQL database storage, and a modern responsive UI.
 
 ## Features
 
 - **Hello World Home Page**: Landing page with navigation to all features
 - **Calculator**: Perform basic arithmetic operations (addition, subtraction, multiplication, division)
-- **Contact Form**: Submit and store contact information (name, surname, email) in memory
-- **Contact List**: View all stored contacts from the in-memory database
-- **Responsive Design**: Modern, mobile-friendly UI with smooth animations
-- **No Database Required**: Uses in-memory storage - no PostgreSQL installation needed!
+- **Calculator History**: View and manage calculation history with delete functionality
+- **Contact Form**: Submit and store contact information (name, surname, email) in PostgreSQL
+- **Contact List**: View all stored contacts from the database
+- **Responsive Design**: Modern, mobile-friendly UI
+- **No JavaScript**: Pure HTML/CSS with server-side rendering for maximum compatibility and security
+- **PostgreSQL Database**: Persistent storage with GORM ORM
 
 ## Project Structure
 
@@ -19,10 +21,11 @@ gospace/
 ├── gospace                 # Compiled binary
 ├── config/                 # Configuration files
 │   ├── config.go          # Environment configuration
-│   ├── database.go        # PostgreSQL connector (optional)
-│   └── mock_database.go   # In-memory database implementation
+│   ├── database.go        # PostgreSQL connector
+│   └── mock_database.go   # Legacy mock database (deprecated)
 ├── models/                 # Data models
-│   └── contact.go         # Contact model
+│   ├── contact.go         # Contact model
+│   └── calculator_history.go # Calculator history model
 ├── handlers/               # HTTP request handlers
 │   ├── handler.go         # Base handler
 │   ├── home.go            # Home page handler
@@ -31,17 +34,16 @@ gospace/
 ├── templates/              # HTML templates
 │   ├── home.html          # Home page template
 │   ├── calculator.html    # Calculator page template
+│   ├── calculator_history.html # Calculator history template
 │   ├── contact.html       # Contact form template
 │   └── contacts_list.html # Contacts list template
 ├── static/                 # Static assets
-│   ├── css/
-│   │   └── style.css      # Main stylesheet
-│   └── js/
-│       ├── main.js        # Common JavaScript
-│       ├── calculator.js  # Calculator-specific JS
-│       └── contact.js     # Contact form-specific JS
+│   └── css/
+│       └── style.css      # Main stylesheet
 ├── tests/                  # Test files
+│   ├── test_helpers.go    # Shared test utilities
 │   ├── handlers_test.go   # Handler tests
+│   ├── calculator_history_test.go # Calculator history tests
 │   └── integration_test.go # Integration tests
 ├── go.mod                  # Go module file
 ├── go.sum                  # Go dependencies
@@ -49,8 +51,14 @@ gospace/
 ├── .gitignore             # Git ignore file
 ├── Dockerfile             # Docker configuration
 ├── docker-compose.yml     # Docker Compose configuration
+├── k8s-deployment.yaml    # Kubernetes app deployment
+├── k8s-postgres.yaml      # Kubernetes PostgreSQL deployment
+├── deploy-docker.sh       # Docker deployment script
+├── deploy-k8s.sh          # Kubernetes deployment script
 ├── README.md              # This file
 ├── QUICKSTART.md          # Quick start guide
+├── DEPLOYMENT.md          # Comprehensive deployment guide
+├── KUBERNETES.md          # Kubernetes deployment guide
 └── API.md                 # API documentation
 ```
 
@@ -58,12 +66,11 @@ gospace/
 
 - Go 1.21 or higher
 - Git
-
-**Note**: No database installation required! The application uses in-memory storage.
+- PostgreSQL 15+ (or use Docker/Kubernetes deployment)
 
 ## Installation
 
-### Quick Start (2 minutes)
+### Option 1: Local Development
 
 1. **Clone the Repository**
 
@@ -72,23 +79,70 @@ git clone <repository-url>
 cd gospace
 ```
 
-2. **Install Dependencies**
+2. **Set up PostgreSQL**
+
+Create a database and update `.env` file:
+
+```bash
+cp .env.example .env
+# Edit .env with your PostgreSQL credentials
+```
+
+3. **Install Dependencies**
 
 ```bash
 go mod download
 ```
 
-3. **Run the Application**
+4. **Run the Application**
 
 ```bash
 go run main.go
 ```
 
-4. **Access the Application**
+5. **Access the Application**
 
 Open your browser and navigate to `http://localhost:8080`
 
-That's it! No database setup required.
+### Option 2: Docker Compose (Recommended)
+
+The easiest way to run the application with all dependencies:
+
+```bash
+./deploy-docker.sh
+```
+
+Or manually:
+
+```bash
+docker build -t gospace:latest .
+docker-compose up -d
+```
+
+Access at `http://localhost:8080`
+
+### Option 3: Kubernetes
+
+Deploy to Kubernetes cluster:
+
+```bash
+./deploy-k8s.sh
+```
+
+Or manually:
+
+```bash
+# Build image
+docker build -t gospace:latest .
+
+# Deploy PostgreSQL
+kubectl apply -f k8s-postgres.yaml
+
+# Deploy application
+kubectl apply -f k8s-deployment.yaml
+```
+
+Access via NodePort at `http://localhost:30080`
 
 ## Usage
 
@@ -100,14 +154,16 @@ Navigate to `http://localhost:8080` to see the landing page with links to all fe
 2. Enter two numbers
 3. Select an operation (add, subtract, multiply, divide)
 4. Click "Calculate" to see the result
+5. View calculation history at `http://localhost:8080/calculator/history`
+6. Delete past calculations from the history page
 
 ### Contact Form
 1. Go to `http://localhost:8080/contact`
 2. Fill in your name, surname, and email
-3. Click "Submit" to save to the in-memory database
+3. Click "Submit" to save to the PostgreSQL database
 4. View all contacts at `http://localhost:8080/contacts`
 
-**Note**: Data is stored in memory and will be lost when the application restarts.
+**Note**: Data is stored in PostgreSQL and persists across application restarts.
 
 ## API Endpoints
 
@@ -116,6 +172,8 @@ Navigate to `http://localhost:8080` to see the landing page with links to all fe
 | GET | `/` | Home page |
 | GET | `/calculator` | Calculator page |
 | POST | `/calculator` | Calculate result |
+| GET | `/calculator/history` | View calculation history |
+| POST | `/calculator/history/:id/delete` | Delete calculation |
 | GET | `/contact` | Contact form page |
 | POST | `/contact` | Submit contact |
 | GET | `/contacts` | List all contacts |
@@ -174,13 +232,20 @@ docker-compose down
 docker build -t gospace .
 ```
 
-### Run with Docker (In-Memory Mode)
+### Run with Docker (Standalone)
 
 ```bash
-docker run -p 8080:8080 gospace
+# Requires external PostgreSQL
+docker run -p 8080:8080 \
+  -e DB_HOST=host.docker.internal \
+  -e DB_PORT=5432 \
+  -e DB_USER=postgres \
+  -e DB_PASSWORD=postgres \
+  -e DB_NAME=gospace \
+  gospace
 ```
 
-**Note**: The Docker Compose setup includes PostgreSQL, but the application currently uses in-memory storage by default. To use PostgreSQL, modify [`main.go`](main.go:14) to use `config.InitDB()` instead of `config.NewMockDB()`.
+**Note**: The application requires PostgreSQL. Use Docker Compose for a complete setup with database included.
 
 ## Environment Variables
 

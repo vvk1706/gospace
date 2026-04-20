@@ -4,9 +4,10 @@ This guide explains how to deploy GoSpace to Kubernetes using Rancher Desktop or
 
 ## Overview
 
-The application is deployed using the [`k8s-deployment.yaml`](k8s-deployment.yaml) manifest, which includes:
-- Namespace isolation
-- Deployment with 2 replicas
+The application is deployed using Kubernetes manifests, which include:
+- PostgreSQL StatefulSet with persistent storage ([`k8s-postgres.yaml`](k8s-postgres.yaml))
+- Application Deployment with 2 replicas ([`k8s-deployment.yaml`](k8s-deployment.yaml))
+- ConfigMap and Secret for database configuration
 - NodePort service for external access
 - Optional Ingress for domain-based routing
 - Health checks (liveness and readiness probes)
@@ -14,9 +15,9 @@ The application is deployed using the [`k8s-deployment.yaml`](k8s-deployment.yam
 
 ## Prerequisites
 
-- Rancher Desktop installed and running
-- kubectl configured to use Rancher Desktop context
-- Docker daemon accessible from Rancher Desktop
+- Rancher Desktop installed and running (or any Kubernetes cluster)
+- kubectl configured to use your Kubernetes context
+- Docker daemon accessible for building images
 
 ## Quick Deployment
 
@@ -34,10 +35,32 @@ docker images | grep gospace
 
 ### 2. Deploy to Kubernetes
 
-Apply the Kubernetes manifests:
+**Option A: Automated Deployment (Recommended)**
 
 ```bash
-# Deploy all resources
+# Make script executable (first time only)
+chmod +x deploy-k8s.sh
+
+# Deploy everything (PostgreSQL + Application)
+./deploy-k8s.sh
+
+# The script will:
+# - Create namespace
+# - Deploy PostgreSQL with persistent storage
+# - Deploy the application
+# - Show access instructions
+```
+
+**Option B: Manual Deployment**
+
+```bash
+# Deploy PostgreSQL first
+kubectl apply -f k8s-postgres.yaml
+
+# Wait for PostgreSQL to be ready
+kubectl wait --for=condition=ready pod -l app=postgres -n gospace --timeout=120s
+
+# Deploy the application
 kubectl apply -f k8s-deployment.yaml
 
 # Verify deployment
@@ -58,7 +81,47 @@ open http://localhost:30080
 
 ## Kubernetes Resources
 
-The [`k8s-deployment.yaml`](k8s-deployment.yaml) includes:
+### PostgreSQL Resources ([`k8s-postgres.yaml`](k8s-postgres.yaml))
+
+#### ConfigMap
+- **Name**: `postgres-config`
+- **Namespace**: `gospace`
+- **Data**:
+  - `POSTGRES_DB`: gospace
+  - `POSTGRES_USER`: postgres
+
+#### Secret
+- **Name**: `postgres-secret`
+- **Namespace**: `gospace`
+- **Data**:
+  - `POSTGRES_PASSWORD`: Base64 encoded password
+
+#### PersistentVolumeClaim
+- **Name**: `postgres-pvc`
+- **Namespace**: `gospace`
+- **Storage**: 1Gi
+- **Access Mode**: ReadWriteOnce
+- **Storage Class**: local-path (Rancher Desktop default)
+
+#### StatefulSet
+- **Name**: `postgres`
+- **Namespace**: `gospace`
+- **Replicas**: 1
+- **Image**: `postgres:15-alpine`
+- **Container Port**: 5432
+- **Volume Mount**: `/var/lib/postgresql/data`
+- **Resources**:
+  - Requests: 256Mi memory, 250m CPU
+  - Limits: 512Mi memory, 500m CPU
+
+#### Service
+- **Name**: `postgres-service`
+- **Namespace**: `gospace`
+- **Type**: ClusterIP
+- **Port**: 5432
+- **Selector**: `app: postgres`
+
+### Application Resources ([`k8s-deployment.yaml`](k8s-deployment.yaml))
 
 ### Namespace
 - **Name**: `gospace`
@@ -74,6 +137,12 @@ The [`k8s-deployment.yaml`](k8s-deployment.yaml) includes:
 - **Container Port**: 8080
 - **Environment Variables**:
   - `PORT`: "8080"
+  - `DB_HOST`: postgres-service (from ConfigMap)
+  - `DB_PORT`: "5432" (from ConfigMap)
+  - `DB_USER`: postgres (from ConfigMap)
+  - `DB_PASSWORD`: from Secret
+  - `DB_NAME`: gospace (from ConfigMap)
+  - `DB_SSLMODE`: disable (from ConfigMap)
 - **Resources**:
   - Requests: 64Mi memory, 100m CPU
   - Limits: 128Mi memory, 200m CPU
@@ -150,6 +219,25 @@ kubectl rollout restart deployment gospace -n gospace
 
 # Check rollout status
 kubectl rollout status deployment gospace -n gospace
+
+# View logs during update
+kubectl logs -n gospace -l app=gospace -f
+```
+
+### Database Operations
+
+```bash
+# Connect to PostgreSQL
+kubectl exec -it postgres-0 -n gospace -- psql -U postgres -d gospace
+
+# Backup database
+kubectl exec postgres-0 -n gospace -- pg_dump -U postgres gospace > backup.sql
+
+# Restore database
+kubectl exec -i postgres-0 -n gospace -- psql -U postgres gospace < backup.sql
+
+# View database logs
+kubectl logs postgres-0 -n gospace
 ```
 
 ### Access Pod Shell
@@ -276,11 +364,11 @@ resources:
 ```
 
 ### Persistent Storage
-Since the app uses in-memory storage by default, data is lost on pod restart. For production:
-- Switch to PostgreSQL by modifying [`main.go`](main.go:14) to use `config.InitDB()`
-- Deploy PostgreSQL as a StatefulSet
-- Add PersistentVolumeClaims for database data persistence
-- Use the [`docker-compose.yml`](docker-compose.yml) as reference for database configuration
+The application uses PostgreSQL with persistent storage:
+- PostgreSQL deployed as StatefulSet with PersistentVolumeClaim
+- Data persists across pod restarts and redeployments
+- 1Gi storage allocated by default (adjust in [`k8s-postgres.yaml`](k8s-postgres.yaml))
+- For production, consider using a managed database service or increase storage size
 
 ### Security
 - Use non-root user in container
@@ -338,10 +426,13 @@ spec:
 ## Additional Resources
 
 - [`README.md`](README.md) - Main project documentation
+- [`DEPLOYMENT.md`](DEPLOYMENT.md) - Comprehensive deployment guide
 - [`API.md`](API.md) - API endpoint documentation
 - [`QUICKSTART.md`](QUICKSTART.md) - Quick start guide
 - [`docker-compose.yml`](docker-compose.yml) - Docker Compose configuration
 - [`Dockerfile`](Dockerfile) - Docker image build configuration
+- [`k8s-postgres.yaml`](k8s-postgres.yaml) - PostgreSQL Kubernetes manifest
+- [`deploy-k8s.sh`](deploy-k8s.sh) - Automated Kubernetes deployment script
 
 ## Support
 

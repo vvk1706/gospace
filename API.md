@@ -31,10 +31,34 @@ This document describes all available API endpoints in GoSpace.
   - `num1` (required): First number (float64)
   - `num2` (required): Second number (float64)
   - `operation` (required): Operation type (`add`, `subtract`, `multiply`, `divide`)
-- **Response**: HTML page with calculation result
+- **Response**: Redirect to `/calculator/history` after saving calculation
 - **Error Responses**:
   - `400 Bad Request`: Invalid numbers or operation
   - `400 Bad Request`: Division by zero (when operation is `divide` and num2 is 0)
+  - `500 Internal Server Error`: Database error
+
+#### Get Calculator History
+- **URL**: `/calculator/history`
+- **Method**: `GET`
+- **Description**: Displays all calculation history from the database
+- **Handler**: [`handlers.ListCalculatorHistory`](handlers/calculator.go:60)
+- **Template**: [`templates/calculator_history.html`](templates/calculator_history.html)
+- **Response**: HTML page with history table
+- **Error Responses**:
+  - `500 Internal Server Error`: Database error
+
+#### Delete Calculation
+- **URL**: `/calculator/history/:id/delete`
+- **Method**: `POST`
+- **Description**: Deletes a calculation from history
+- **Handler**: [`handlers.DeleteCalculatorHistory`](handlers/calculator.go:80)
+- **Parameters**:
+  - `id` (required): Calculation ID (uint, URL parameter)
+- **Response**: Redirect to `/calculator/history`
+- **Error Responses**:
+  - `400 Bad Request`: Invalid ID format
+  - `404 Not Found`: Calculation not found
+  - `500 Internal Server Error`: Database error
 
 ### Contact Form
 
@@ -63,7 +87,7 @@ This document describes all available API endpoints in GoSpace.
 #### List All Contacts
 - **URL**: `/contacts`
 - **Method**: `GET`
-- **Description**: Displays all contacts from the in-memory database
+- **Description**: Displays all contacts from the PostgreSQL database
 - **Handler**: [`handlers.ListContacts`](handlers/contact.go:50)
 - **Template**: [`templates/contacts_list.html`](templates/contacts_list.html)
 - **Response**: HTML page with contacts table
@@ -86,7 +110,37 @@ type Contact struct {
 }
 ```
 
+### Calculator History
+Defined in [`models/calculator_history.go`](models/calculator_history.go)
+
+```go
+type CalculatorHistory struct {
+    ID        uint      `gorm:"primaryKey" json:"id"`
+    Num1      float64   `json:"num1"`
+    Num2      float64   `json:"num2"`
+    Operation string    `json:"operation"`
+    Result    float64   `json:"result"`
+    Version   int       `json:"version"`
+    CreatedAt time.Time `json:"created_at"`
+    UpdatedAt time.Time `json:"updated_at"`
+}
+```
+
 Example JSON representation:
+```json
+{
+  "id": 1,
+  "num1": 10.0,
+  "num2": 5.0,
+  "operation": "add",
+  "result": 15.0,
+  "version": 1,
+  "created_at": "2026-04-20T14:00:00Z",
+  "updated_at": "2026-04-20T14:00:00Z"
+}
+```
+
+Example JSON representation for Contact:
 ```json
 {
   "id": 1,
@@ -109,18 +163,26 @@ Error messages are displayed in the HTML response with appropriate styling.
 
 ## Database
 
-The application uses an in-memory database implementation ([`config/mock_database.go`](config/mock_database.go)) by default:
-- Thread-safe operations with mutex protection
-- Automatic ID generation
-- Email uniqueness validation
-- No external database required
+The application uses PostgreSQL with GORM ORM ([`config/database.go`](config/database.go)):
+- Persistent data storage
+- Automatic schema migration
+- GORM model relationships
+- Optimistic locking with version field for calculator history
+- Email uniqueness validation for contacts
+- Thread-safe operations
 
-To use PostgreSQL instead, modify [`main.go`](main.go:14) to use `config.InitDB()` instead of `config.NewMockDB()`.
+Database configuration is loaded from environment variables (see [`.env.example`](.env.example)).
 
 ## Static Assets
 
-- **CSS**: [`static/css/style.css`](static/css/style.css)
-- **JavaScript**:
-  - [`static/js/main.js`](static/js/main.js) - Common functionality
-  - [`static/js/calculator.js`](static/js/calculator.js) - Calculator-specific
-  - [`static/js/contact.js`](static/js/contact.js) - Contact form-specific
+- **CSS**: [`static/css/style.css`](static/css/style.css) - All styling
+- **No JavaScript**: The application uses pure HTML/CSS with server-side rendering for maximum compatibility and security
+
+## Security Features
+
+- **Input Validation**: All user inputs are validated server-side
+- **SQL Injection Prevention**: GORM parameterized queries protect against SQL injection
+- **Operation Whitelisting**: Only valid operations (add, subtract, multiply, divide) are allowed
+- **ID Validation**: Calculator history IDs are validated before database operations
+- **Optimistic Locking**: Version field prevents race conditions in concurrent updates
+- **No Client-Side JavaScript**: Eliminates XSS attack vectors
