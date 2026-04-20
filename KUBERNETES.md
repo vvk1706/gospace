@@ -1,6 +1,16 @@
 # Kubernetes Deployment Guide
 
-This guide explains how to deploy the Gin Web Application to Kubernetes using Rancher Desktop.
+This guide explains how to deploy the Gin Web Application to Kubernetes using Rancher Desktop or any Kubernetes cluster.
+
+## Overview
+
+The application is deployed using the [`k8s-deployment.yaml`](k8s-deployment.yaml) manifest, which includes:
+- Namespace isolation
+- Deployment with 2 replicas
+- NodePort service for external access
+- Optional Ingress for domain-based routing
+- Health checks (liveness and readiness probes)
+- Resource limits and requests
 
 ## Prerequisites
 
@@ -48,35 +58,55 @@ open http://localhost:30080
 
 ## Kubernetes Resources
 
-The deployment includes:
+The [`k8s-deployment.yaml`](k8s-deployment.yaml) includes:
 
 ### Namespace
 - **Name**: `gin-webapp`
-- Isolates all application resources
+- **Purpose**: Isolates all application resources
+- **Labels**: `name: gin-webapp`
 
 ### Deployment
 - **Name**: `gin-webapp`
+- **Namespace**: `gin-webapp`
 - **Replicas**: 2 (for high availability)
 - **Image**: `gin-webapp:latest`
+- **Image Pull Policy**: `IfNotPresent` (uses local images)
 - **Container Port**: 8080
+- **Environment Variables**:
+  - `PORT`: "8080"
 - **Resources**:
   - Requests: 64Mi memory, 100m CPU
   - Limits: 128Mi memory, 200m CPU
 - **Health Checks**:
-  - Liveness probe on `/` endpoint
-  - Readiness probe on `/` endpoint
+  - **Liveness Probe**: HTTP GET on `/` (port 8080)
+    - Initial delay: 10s
+    - Period: 10s
+    - Timeout: 5s
+    - Failure threshold: 3
+  - **Readiness Probe**: HTTP GET on `/` (port 8080)
+    - Initial delay: 5s
+    - Period: 5s
+    - Timeout: 3s
+    - Failure threshold: 3
 
 ### Service
 - **Name**: `gin-webapp-service`
+- **Namespace**: `gin-webapp`
 - **Type**: NodePort
+- **Selector**: `app: gin-webapp`
 - **Port**: 8080 (internal)
+- **Target Port**: 8080
 - **NodePort**: 30080 (external)
 - **Access**: `http://localhost:30080`
+- **Session Affinity**: None
 
 ### Ingress (Optional)
 - **Name**: `gin-webapp-ingress`
+- **Namespace**: `gin-webapp`
 - **Host**: `gin-webapp.local`
-- Requires nginx ingress controller
+- **Ingress Class**: `nginx`
+- **Annotations**: `nginx.ingress.kubernetes.io/rewrite-target: /`
+- **Requires**: nginx ingress controller
 
 ## Useful Commands
 
@@ -246,10 +276,11 @@ resources:
 ```
 
 ### Persistent Storage
-Since the app uses in-memory storage, data is lost on pod restart. For production:
-- Consider adding a real database
-- Use StatefulSet for stateful workloads
-- Add PersistentVolumeClaims for data persistence
+Since the app uses in-memory storage by default, data is lost on pod restart. For production:
+- Switch to PostgreSQL by modifying [`main.go`](main.go:14) to use `config.InitDB()`
+- Deploy PostgreSQL as a StatefulSet
+- Add PersistentVolumeClaims for database data persistence
+- Use the [`docker-compose.yml`](docker-compose.yml) as reference for database configuration
 
 ### Security
 - Use non-root user in container
@@ -304,9 +335,19 @@ spec:
             cpu: "500m"
 ```
 
+## Additional Resources
+
+- [`README.md`](README.md) - Main project documentation
+- [`API.md`](API.md) - API endpoint documentation
+- [`QUICKSTART.md`](QUICKSTART.md) - Quick start guide
+- [`docker-compose.yml`](docker-compose.yml) - Docker Compose configuration
+- [`Dockerfile`](Dockerfile) - Docker image build configuration
+
 ## Support
 
 For issues or questions:
 - Check pod logs: `kubectl logs -n gin-webapp -l app=gin-webapp`
 - Review events: `kubectl get events -n gin-webapp`
+- Describe resources: `kubectl describe deployment gin-webapp -n gin-webapp`
 - Consult Rancher Desktop documentation
+- Review the project's GitHub issues

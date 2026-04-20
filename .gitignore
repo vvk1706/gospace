@@ -5,6 +5,9 @@
 *.so
 *.dylib
 
+# Project binary
+gin-webapp
+
 # Test binary, built with `go test -c`
 *.test
 

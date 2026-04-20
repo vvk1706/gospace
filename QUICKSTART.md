@@ -15,7 +15,7 @@ This guide will help you get the Gin Web Application up and running in **under 2
 
 ```bash
 git clone <repository-url>
-cd gin-webapp
+cd gospace
 ```
 
 ### 2. Install Dependencies
@@ -84,10 +84,35 @@ go test ./tests -v
 
 ```bash
 # Build the binary
-go build -o gin-webapp
+go build -o gin-webapp main.go
 
 # Run the binary
 ./gin-webapp
+```
+
+## Docker Deployment
+
+### Using Docker Compose (Recommended)
+
+```bash
+# Start all services (app + PostgreSQL)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop services
+docker-compose down
+```
+
+### Using Docker Only
+
+```bash
+# Build the image
+docker build -t gin-webapp .
+
+# Run the container
+docker run -p 8080:8080 gin-webapp
 ```
 
 ## Customization
@@ -123,11 +148,13 @@ docker run -p 8080:8080 gin-webapp
 
 ## Next Steps
 
-- Read the full [README.md](README.md) for detailed documentation
-- Check [API.md](API.md) for API endpoint details
+- Read the full [`README.md`](README.md) for detailed documentation
+- Check [`API.md`](API.md) for API endpoint details
+- Review [`KUBERNETES.md`](KUBERNETES.md) for Kubernetes deployment
 - Explore the code structure in the project directories
-- Modify templates in `templates/` directory
-- Customize styles in `static/css/style.css`
+- Modify templates in [`templates/`](templates/) directory
+- Customize styles in [`static/css/style.css`](static/css/style.css)
+- Add new handlers in [`handlers/`](handlers/) directory
 
 ## Troubleshooting
 

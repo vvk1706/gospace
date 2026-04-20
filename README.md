@@ -14,8 +14,9 @@ A comprehensive web application built with Go and the Gin framework, featuring a
 ## Project Structure
 
 ```
-gin-webapp/
+gospace/
 ├── main.go                 # Application entry point
+├── gin-webapp              # Compiled binary
 ├── config/                 # Configuration files
 │   ├── config.go          # Environment configuration
 │   ├── database.go        # PostgreSQL connector (optional)
@@ -68,7 +69,7 @@ gin-webapp/
 
 ```bash
 git clone <repository-url>
-cd gin-webapp
+cd gospace
 ```
 
 2. **Install Dependencies**
@@ -144,7 +145,7 @@ go tool cover -html=coverage.out
 
 ```bash
 # Build the binary
-go build -o gin-webapp
+go build -o gin-webapp main.go
 
 # Run the binary
 ./gin-webapp
@@ -152,23 +153,50 @@ go build -o gin-webapp
 
 ## Docker Deployment
 
-### Build Docker Image
+### Using Docker Compose (with PostgreSQL)
+
+The project includes a [`docker-compose.yml`](docker-compose.yml) that sets up both the application and PostgreSQL database:
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+### Build Docker Image Only
 
 ```bash
 docker build -t gin-webapp .
 ```
 
-### Run with Docker
+### Run with Docker (In-Memory Mode)
 
 ```bash
 docker run -p 8080:8080 gin-webapp
 ```
 
+**Note**: The Docker Compose setup includes PostgreSQL, but the application currently uses in-memory storage by default. To use PostgreSQL, modify [`main.go`](main.go:14) to use `config.InitDB()` instead of `config.NewMockDB()`.
+
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| PORT | Application port | 8080 |
+The application supports the following environment variables (see [`.env.example`](.env.example)):
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| PORT | Application port | 8080 | No |
+| DB_HOST | PostgreSQL host | localhost | Only if using PostgreSQL |
+| DB_PORT | PostgreSQL port | 5432 | Only if using PostgreSQL |
+| DB_USER | PostgreSQL user | postgres | Only if using PostgreSQL |
+| DB_PASSWORD | PostgreSQL password | postgres | Only if using PostgreSQL |
+| DB_NAME | PostgreSQL database name | gin_webapp | Only if using PostgreSQL |
+| DB_SSLMODE | PostgreSQL SSL mode | disable | Only if using PostgreSQL |
+
+**Note**: Database environment variables are only needed if you switch from in-memory storage to PostgreSQL. By default, the application uses in-memory storage and only requires the PORT variable (which defaults to 8080).
 
 ## Development
 

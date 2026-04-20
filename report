@@ -237,6 +237,68 @@ go run main.go
 - All docs emphasize zero-config setup
 
 **The application is production-ready and requires no database installation!**
+-------------------------------------------------------------------
+Successfully created Kubernetes deployment configuration for Rancher Desktop!
 
+## Kubernetes Deployment Files Created:
+
+### 📄 k8s-deployment.yaml
+Complete Kubernetes manifest including:
+- **Namespace**: `gin-webapp` for resource isolation
+- **Deployment**: 2 replicas with health checks
+- **Service**: NodePort type exposing port 30080
+- **Ingress**: Optional domain-based access
+
+### 📄 KUBERNETES.md
+Comprehensive deployment guide with:
+- Step-by-step deployment instructions
+- Useful kubectl commands
+- Troubleshooting guide
+- Production considerations
+- Scaling and monitoring tips
+
+## Quick Deployment Steps:
+
+```bash
+# 1. Build Docker image
+docker build -t gin-webapp:latest .
+
+# 2. Deploy to Kubernetes
+kubectl apply -f k8s-deployment.yaml
+
+# 3. Access application
+open http://localhost:30080
+```
+
+## Key Features:
+
+✅ **NodePort Service**: Port 30080 exposed for external access
+✅ **High Availability**: 2 replicas with load balancing
+✅ **Health Checks**: Liveness and readiness probes
+✅ **Resource Limits**: Memory and CPU constraints
+✅ **Rancher Desktop Ready**: Works out-of-the-box
+✅ **Optional Ingress**: Domain-based access support
+
+## Access Points:
+
+- **NodePort**: http://localhost:30080
+- **Port Forward**: `kubectl port-forward -n gin-webapp service/gin-webapp-service 8080:8080`
+- **Ingress** (optional): http://gin-webapp.local
+
+## Monitoring:
+
+```bash
+# View all resources
+kubectl get all -n gin-webapp
+
+# Check logs
+kubectl logs -n gin-webapp -l app=gin-webapp -f
+
+# Scale replicas
+kubectl scale deployment gin-webapp -n gin-webapp --replicas=3
+```
+
+**Ready for Rancher Desktop deployment!**
+---------------------------------------------------------------------
 
 
