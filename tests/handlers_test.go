@@ -9,9 +9,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/user/gin-webapp/config"
-	"github.com/user/gin-webapp/handlers"
-	"github.com/user/gin-webapp/models"
+	"github.com/user/gospace/config"
+	"github.com/user/gospace/handlers"
+	"github.com/user/gospace/models"
 )
 
 // setupTestDB creates a mock database for testing

@@ -6,7 +6,10 @@
 *.dylib
 
 # Project binary
-gin-webapp
+gospace
+
+# Report files
+report
 
 # Test binary, built with `go test -c`
 *.test

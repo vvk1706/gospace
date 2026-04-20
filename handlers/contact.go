@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/user/gin-webapp/models"
+	"github.com/user/gospace/models"
 )
 
 // ContactForm handles the contact form page request

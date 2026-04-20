@@ -26,10 +26,10 @@ First, build the Docker image in Rancher Desktop's Docker environment:
 
 ```bash
 # Build the image
-docker build -t gin-webapp:latest .
+docker build -t gospace:latest .
 
 # Verify the image
-docker images | grep gin-webapp
+docker images | grep gospace
 ```
 
 ### 2. Deploy to Kubernetes
@@ -41,7 +41,7 @@ Apply the Kubernetes manifests:
 kubectl apply -f k8s-deployment.yaml
 
 # Verify deployment
-kubectl get all -n gin-webapp
+kubectl get all -n gospace
 ```
 
 ### 3. Access the Application
@@ -61,15 +61,15 @@ open http://localhost:30080
 The [`k8s-deployment.yaml`](k8s-deployment.yaml) includes:
 
 ### Namespace
-- **Name**: `gin-webapp`
+- **Name**: `gospace`
 - **Purpose**: Isolates all application resources
-- **Labels**: `name: gin-webapp`
+- **Labels**: `name: gospace`
 
 ### Deployment
-- **Name**: `gin-webapp`
-- **Namespace**: `gin-webapp`
+- **Name**: `gospace`
+- **Namespace**: `gospace`
 - **Replicas**: 2 (for high availability)
-- **Image**: `gin-webapp:latest`
+- **Image**: `gospace:latest`
 - **Image Pull Policy**: `IfNotPresent` (uses local images)
 - **Container Port**: 8080
 - **Environment Variables**:
@@ -90,10 +90,10 @@ The [`k8s-deployment.yaml`](k8s-deployment.yaml) includes:
     - Failure threshold: 3
 
 ### Service
-- **Name**: `gin-webapp-service`
-- **Namespace**: `gin-webapp`
+- **Name**: `gospace-service`
+- **Namespace**: `gospace`
 - **Type**: NodePort
-- **Selector**: `app: gin-webapp`
+- **Selector**: `app: gospace`
 - **Port**: 8080 (internal)
 - **Target Port**: 8080
 - **NodePort**: 30080 (external)
@@ -101,9 +101,9 @@ The [`k8s-deployment.yaml`](k8s-deployment.yaml) includes:
 - **Session Affinity**: None
 
 ### Ingress (Optional)
-- **Name**: `gin-webapp-ingress`
-- **Namespace**: `gin-webapp`
-- **Host**: `gin-webapp.local`
+- **Name**: `gospace-ingress`
+- **Namespace**: `gospace`
+- **Host**: `gospace.local`
 - **Ingress Class**: `nginx`
 - **Annotations**: `nginx.ingress.kubernetes.io/rewrite-target: /`
 - **Requires**: nginx ingress controller
@@ -114,59 +114,59 @@ The [`k8s-deployment.yaml`](k8s-deployment.yaml) includes:
 
 ```bash
 # View all resources
-kubectl get all -n gin-webapp
+kubectl get all -n gospace
 
 # Check pod status
-kubectl get pods -n gin-webapp
+kubectl get pods -n gospace
 
 # View pod logs
-kubectl logs -n gin-webapp -l app=gin-webapp
+kubectl logs -n gospace -l app=gospace
 
 # Follow logs
-kubectl logs -n gin-webapp -l app=gin-webapp -f
+kubectl logs -n gospace -l app=gospace -f
 
 # Describe deployment
-kubectl describe deployment gin-webapp -n gin-webapp
+kubectl describe deployment gospace -n gospace
 ```
 
 ### Scaling
 
 ```bash
 # Scale to 3 replicas
-kubectl scale deployment gin-webapp -n gin-webapp --replicas=3
+kubectl scale deployment gospace -n gospace --replicas=3
 
 # Verify scaling
-kubectl get pods -n gin-webapp
+kubectl get pods -n gospace
 ```
 
 ### Update Application
 
 ```bash
 # Rebuild image
-docker build -t gin-webapp:latest .
+docker build -t gospace:latest .
 
 # Restart deployment to use new image
-kubectl rollout restart deployment gin-webapp -n gin-webapp
+kubectl rollout restart deployment gospace -n gospace
 
 # Check rollout status
-kubectl rollout status deployment gin-webapp -n gin-webapp
+kubectl rollout status deployment gospace -n gospace
 ```
 
 ### Access Pod Shell
 
 ```bash
 # Get pod name
-kubectl get pods -n gin-webapp
+kubectl get pods -n gospace
 
 # Access shell
-kubectl exec -it <pod-name> -n gin-webapp -- /bin/sh
+kubectl exec -it <pod-name> -n gospace -- /bin/sh
 ```
 
 ### Port Forwarding (Alternative Access)
 
 ```bash
 # Forward local port 8080 to service
-kubectl port-forward -n gin-webapp service/gin-webapp-service 8080:8080
+kubectl port-forward -n gospace service/gospace-service 8080:8080
 
 # Access at http://localhost:8080
 ```
@@ -187,13 +187,13 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 Add to `/etc/hosts`:
 
 ```
-127.0.0.1 gin-webapp.local
+127.0.0.1 gospace.local
 ```
 
 ### 3. Access via Domain
 
 ```bash
-open http://gin-webapp.local
+open http://gospace.local
 ```
 
 ## Troubleshooting
@@ -202,41 +202,41 @@ open http://gin-webapp.local
 
 ```bash
 # Check pod events
-kubectl describe pod <pod-name> -n gin-webapp
+kubectl describe pod <pod-name> -n gospace
 
 # Check logs
-kubectl logs <pod-name> -n gin-webapp
+kubectl logs <pod-name> -n gospace
 ```
 
 ### Image Pull Issues
 
 ```bash
 # Verify image exists
-docker images | grep gin-webapp
+docker images | grep gospace
 
 # Check imagePullPolicy in deployment
-kubectl get deployment gin-webapp -n gin-webapp -o yaml | grep imagePullPolicy
+kubectl get deployment gospace -n gospace -o yaml | grep imagePullPolicy
 ```
 
 ### Service Not Accessible
 
 ```bash
 # Check service endpoints
-kubectl get endpoints -n gin-webapp
+kubectl get endpoints -n gospace
 
 # Verify service
-kubectl describe service gin-webapp-service -n gin-webapp
+kubectl describe service gospace-service -n gospace
 
 # Test from within cluster
-kubectl run -it --rm debug --image=alpine --restart=Never -n gin-webapp -- sh
-# Inside pod: wget -O- http://gin-webapp-service:8080
+kubectl run -it --rm debug --image=alpine --restart=Never -n gospace -- sh
+# Inside pod: wget -O- http://gospace-service:8080
 ```
 
 ### NodePort Not Working
 
 ```bash
 # Verify NodePort is assigned
-kubectl get service gin-webapp-service -n gin-webapp
+kubectl get service gospace-service -n gospace
 
 # Check firewall rules (if applicable)
 # For Rancher Desktop, usually no firewall issues on localhost
@@ -251,10 +251,10 @@ Remove all resources:
 kubectl delete -f k8s-deployment.yaml
 
 # Verify deletion
-kubectl get all -n gin-webapp
+kubectl get all -n gospace
 
 # Delete namespace (if needed)
-kubectl delete namespace gin-webapp
+kubectl delete namespace gospace
 ```
 
 ## Production Considerations
@@ -300,8 +300,8 @@ Since the app uses in-memory storage by default, data is lost on pod restart. Fo
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gin-webapp
-  namespace: gin-webapp
+  name: gospace
+  namespace: gospace
 spec:
   replicas: 3
   strategy:
@@ -321,11 +321,11 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - gin-webapp
+                  - gospace
               topologyKey: kubernetes.io/hostname
       containers:
-      - name: gin-webapp
-        image: gin-webapp:latest
+      - name: gospace
+        image: gospace:latest
         resources:
           requests:
             memory: "128Mi"
@@ -346,8 +346,8 @@ spec:
 ## Support
 
 For issues or questions:
-- Check pod logs: `kubectl logs -n gin-webapp -l app=gin-webapp`
-- Review events: `kubectl get events -n gin-webapp`
-- Describe resources: `kubectl describe deployment gin-webapp -n gin-webapp`
+- Check pod logs: `kubectl logs -n gospace -l app=gospace`
+- Review events: `kubectl get events -n gospace`
+- Describe resources: `kubectl describe deployment gospace -n gospace`
 - Consult Rancher Desktop documentation
 - Review the project's GitHub issues

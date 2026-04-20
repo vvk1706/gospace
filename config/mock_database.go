@@ -3,7 +3,7 @@ package config
 import (
 	"sync"
 
-	"github.com/user/gin-webapp/models"
+	"github.com/user/gospace/models"
 )
 
 // MockDB is an in-memory database implementation

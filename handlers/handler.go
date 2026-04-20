@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/user/gin-webapp/config"
+	"github.com/user/gospace/config"
 )
 
 // Handler holds dependencies for HTTP handlers

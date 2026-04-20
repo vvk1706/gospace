@@ -1,4 +1,4 @@
-module github.com/user/gin-webapp
+module github.com/user/gospace
 
 go 1.25.1
 

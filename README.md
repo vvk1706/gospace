@@ -16,7 +16,7 @@ A comprehensive web application built with Go and the Gin framework, featuring a
 ```
 gospace/
 ├── main.go                 # Application entry point
-├── gin-webapp              # Compiled binary
+├── gospace                 # Compiled binary
 ├── config/                 # Configuration files
 │   ├── config.go          # Environment configuration
 │   ├── database.go        # PostgreSQL connector (optional)
@@ -145,10 +145,10 @@ go tool cover -html=coverage.out
 
 ```bash
 # Build the binary
-go build -o gin-webapp main.go
+go build -o gospace main.go
 
 # Run the binary
-./gin-webapp
+./gospace
 ```
 
 ## Docker Deployment
@@ -171,13 +171,13 @@ docker-compose down
 ### Build Docker Image Only
 
 ```bash
-docker build -t gin-webapp .
+docker build -t gospace .
 ```
 
 ### Run with Docker (In-Memory Mode)
 
 ```bash
-docker run -p 8080:8080 gin-webapp
+docker run -p 8080:8080 gospace
 ```
 
 **Note**: The Docker Compose setup includes PostgreSQL, but the application currently uses in-memory storage by default. To use PostgreSQL, modify [`main.go`](main.go:14) to use `config.InitDB()` instead of `config.NewMockDB()`.

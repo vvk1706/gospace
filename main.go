@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/user/gin-webapp/config"
-	"github.com/user/gin-webapp/handlers"
+	"github.com/user/gospace/config"
+	"github.com/user/gospace/handlers"
 )
 
 func main() {

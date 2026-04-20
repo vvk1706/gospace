@@ -59,7 +59,7 @@ The Gin Web Application is a comprehensive web application built with Go and the
 ```
 gospace/
 ├── main.go                 # Application entry point
-├── gin-webapp              # Compiled binary (gitignored)
+├── gospace                 # Compiled binary (gitignored)
 ├── config/                 # Configuration files
 │   ├── config.go          # Environment configuration
 │   ├── database.go        # PostgreSQL connector (optional)
@@ -179,7 +179,7 @@ go test ./tests -v
 go test ./tests -cover
 
 # Build binary
-go build -o gin-webapp main.go
+go build -o gospace main.go
 ```
 
 ### Docker
@@ -189,10 +189,10 @@ go build -o gin-webapp main.go
 docker-compose up -d
 
 # Build Docker image
-docker build -t gin-webapp .
+docker build -t gospace .
 
 # Run Docker container
-docker run -p 8080:8080 gin-webapp
+docker run -p 8080:8080 gospace
 ```
 
 ### Kubernetes
@@ -202,10 +202,10 @@ docker run -p 8080:8080 gin-webapp
 kubectl apply -f k8s-deployment.yaml
 
 # Check status
-kubectl get all -n gin-webapp
+kubectl get all -n gospace
 
 # View logs
-kubectl logs -n gin-webapp -l app=gin-webapp -f
+kubectl logs -n gospace -l app=gospace -f
 
 # Access application
 open http://localhost:30080

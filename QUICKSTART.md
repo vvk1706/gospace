@@ -84,10 +84,10 @@ go test ./tests -v
 
 ```bash
 # Build the binary
-go build -o gin-webapp main.go
+go build -o gospace main.go
 
 # Run the binary
-./gin-webapp
+./gospace
 ```
 
 ## Docker Deployment
@@ -109,10 +109,10 @@ docker-compose down
 
 ```bash
 # Build the image
-docker build -t gin-webapp .
+docker build -t gospace .
 
 # Run the container
-docker run -p 8080:8080 gin-webapp
+docker run -p 8080:8080 gospace
 ```
 
 ## Customization
@@ -127,8 +127,8 @@ go run main.go
 ### Build with Docker
 
 ```bash
-docker build -t gin-webapp .
-docker run -p 8080:8080 gin-webapp
+docker build -t gospace .
+docker run -p 8080:8080 gospace
 ```
 
 ## Key Features
