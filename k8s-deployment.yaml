@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: gospace
-        image: gospace:latest
+        image: gospace-k:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8080
