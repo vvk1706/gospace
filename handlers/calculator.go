@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	csrf "github.com/utrack/gin-csrf"
 	"github.com/user/gospace/models"
 )
 
@@ -44,7 +43,6 @@ func validateOperation(operation string) bool {
 func (h *Handler) Calculator(c *gin.Context) {
 	c.HTML(http.StatusOK, "calculator.html", gin.H{
 		"title": "Calculator",
-		"csrf":  csrf.GetToken(c),
 	})
 }
 
@@ -61,7 +59,6 @@ func (h *Handler) CalculateResult(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "calculator.html", gin.H{
 			"title": "Calculator",
 			"error": "Invalid numbers provided",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -71,7 +68,6 @@ func (h *Handler) CalculateResult(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "calculator.html", gin.H{
 			"title": "Calculator",
 			"error": "Invalid operation",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -82,7 +78,6 @@ func (h *Handler) CalculateResult(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "calculator.html", gin.H{
 			"title": "Calculator",
 			"error": err.Error(),
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -93,7 +88,6 @@ func (h *Handler) CalculateResult(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "calculator.html", gin.H{
 			"title": "Calculator",
 			"error": "Failed to save calculation to history",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -109,7 +103,6 @@ func (h *Handler) ListCalculatorHistory(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "calculator_history.html", gin.H{
 			"title": "Calculator History",
 			"error": "Failed to retrieve history",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -117,7 +110,6 @@ func (h *Handler) ListCalculatorHistory(c *gin.Context) {
 	c.HTML(http.StatusOK, "calculator_history.html", gin.H{
 		"title":   "Calculator History",
 		"history": history,
-		"csrf":    csrf.GetToken(c),
 	})
 }
 
@@ -131,7 +123,6 @@ func (h *Handler) DeleteCalculatorHistory(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "calculator_history.html", gin.H{
 			"title": "Calculator History",
 			"error": "Invalid ID provided",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -142,7 +133,6 @@ func (h *Handler) DeleteCalculatorHistory(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "calculator_history.html", gin.H{
 			"title": "Calculator History",
 			"error": "Failed to delete history",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -152,7 +142,6 @@ func (h *Handler) DeleteCalculatorHistory(c *gin.Context) {
 		c.HTML(http.StatusNotFound, "calculator_history.html", gin.H{
 			"title": "Calculator History",
 			"error": "Record not found",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}

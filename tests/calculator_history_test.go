@@ -7,37 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	csrf "github.com/utrack/gin-csrf"
-	"github.com/user/gospace/handlers"
 	"github.com/user/gospace/models"
 )
 
-// setupTestRouter creates a test router with CSRF protection (disabled for tests)
-func setupTestRouter() *gin.Engine {
-	gin.SetMode(gin.TestMode)
-	router := gin.New()
-	
-	// Setup session store for CSRF protection
-	store := cookie.NewStore([]byte("test-secret"))
-	router.Use(sessions.Sessions("test_session", store))
-	
-	// Add CSRF protection middleware (skip validation in tests)
-	router.Use(csrf.Middleware(csrf.Options{
-		Secret: "test-csrf-secret",
-		IgnoreMethods: []string{"GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"},
-	}))
-	
-	router.LoadHTMLGlob("../templates/*")
-	return router
-}
-
 func TestListCalculatorHistory_Success(t *testing.T) {
 	db := setupTestDB(t)
-	h := handlers.NewHandler(db)
 
 	// Create test data
 	history1 := models.NewCalculatorHistory(5, 3, "add", 8)
@@ -46,8 +21,7 @@ func TestListCalculatorHistory_Success(t *testing.T) {
 	db.Create(history2)
 
 	// Setup router
-	router := setupTestRouter()
-	router.GET("/calculator/history", h.ListCalculatorHistory)
+	router := setupRouter(db)
 
 	// Make request
 	w := httptest.NewRecorder()
@@ -60,11 +34,9 @@ func TestListCalculatorHistory_Success(t *testing.T) {
 
 func TestListCalculatorHistory_Empty(t *testing.T) {
 	db := setupTestDB(t)
-	h := handlers.NewHandler(db)
 
 	// Setup router
-	router := setupTestRouter()
-	router.GET("/calculator/history", h.ListCalculatorHistory)
+	router := setupRouter(db)
 
 	// Make request
 	w := httptest.NewRecorder()
@@ -77,15 +49,13 @@ func TestListCalculatorHistory_Empty(t *testing.T) {
 
 func TestDeleteCalculatorHistory_Success(t *testing.T) {
 	db := setupTestDB(t)
-	h := handlers.NewHandler(db)
 
 	// Create test data
 	history := models.NewCalculatorHistory(5, 3, "add", 8)
 	db.Create(history)
 
 	// Setup router
-	router := setupTestRouter()
-	router.POST("/calculator/history/:id/delete", h.DeleteCalculatorHistory)
+	router := setupRouter(db)
 
 	// Make request
 	w := httptest.NewRecorder()
@@ -103,11 +73,9 @@ func TestDeleteCalculatorHistory_Success(t *testing.T) {
 
 func TestDeleteCalculatorHistory_InvalidID(t *testing.T) {
 	db := setupTestDB(t)
-	h := handlers.NewHandler(db)
 
 	// Setup router
-	router := setupTestRouter()
-	router.POST("/calculator/history/:id/delete", h.DeleteCalculatorHistory)
+	router := setupRouter(db)
 
 	// Make request with invalid ID
 	w := httptest.NewRecorder()
@@ -120,11 +88,9 @@ func TestDeleteCalculatorHistory_InvalidID(t *testing.T) {
 
 func TestDeleteCalculatorHistory_NonExistent(t *testing.T) {
 	db := setupTestDB(t)
-	h := handlers.NewHandler(db)
 
 	// Setup router
-	router := setupTestRouter()
-	router.POST("/calculator/history/:id/delete", h.DeleteCalculatorHistory)
+	router := setupRouter(db)
 
 	// Make request with non-existent ID
 	w := httptest.NewRecorder()
@@ -137,11 +103,9 @@ func TestDeleteCalculatorHistory_NonExistent(t *testing.T) {
 
 func TestCalculateResult_RedirectsToHistory(t *testing.T) {
 	db := setupTestDB(t)
-	h := handlers.NewHandler(db)
 
 	// Setup router
-	router := setupTestRouter()
-	router.POST("/calculator", h.CalculateResult)
+	router := setupRouter(db)
 
 	// Prepare form data
 	form := url.Values{}
@@ -167,11 +131,9 @@ func TestCalculateResult_RedirectsToHistory(t *testing.T) {
 
 func TestCalculateResult_SavesCorrectResult(t *testing.T) {
 	db := setupTestDB(t)
-	h := handlers.NewHandler(db)
 
 	// Setup router
-	router := setupTestRouter()
-	router.POST("/calculator", h.CalculateResult)
+	router := setupRouter(db)
 
 	// Test different operations
 	tests := []struct {

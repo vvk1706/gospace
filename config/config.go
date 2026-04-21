@@ -7,27 +7,23 @@ import (
 
 // Config holds the application configuration
 type Config struct {
-	DBHost        string
-	DBPort        string
-	DBUser        string
-	DBPassword    string
-	DBName        string
-	DBSSLMode     string
-	SessionSecret string
-	CSRFSecret    string
+	DBHost     string
+	DBPort     string
+	DBUser     string
+	DBPassword string
+	DBName     string
+	DBSSLMode  string
 }
 
 // LoadConfig loads configuration from environment variables
 func LoadConfig() *Config {
 	return &Config{
-		DBHost:        getEnv("DB_HOST", "localhost"),
-		DBPort:        getEnv("DB_PORT", "5432"),
-		DBUser:        getEnv("DB_USER", "postgres"),
-		DBPassword:    getEnv("DB_PASSWORD", "postgres"),
-		DBName:        getEnv("DB_NAME", "gin_webapp"),
-		DBSSLMode:     getEnv("DB_SSLMODE", "disable"),
-		SessionSecret: getEnv("SESSION_SECRET", "change-this-secret-in-production"),
-		CSRFSecret:    getEnv("CSRF_SECRET", "change-this-csrf-secret-in-production"),
+		DBHost:     getEnv("DB_HOST", "localhost"),
+		DBPort:     getEnv("DB_PORT", "5432"),
+		DBUser:     getEnv("DB_USER", "postgres"),
+		DBPassword: getEnv("DB_PASSWORD", "postgres"),
+		DBName:     getEnv("DB_NAME", "gin_webapp"),
+		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
 	}
 }
 

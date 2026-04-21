@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	csrf "github.com/utrack/gin-csrf"
 	"github.com/user/gospace/models"
 )
 
@@ -12,7 +11,6 @@ import (
 func (h *Handler) ContactForm(c *gin.Context) {
 	c.HTML(http.StatusOK, "contact.html", gin.H{
 		"title": "Contact Form",
-		"csrf":  csrf.GetToken(c),
 	})
 }
 
@@ -27,7 +25,6 @@ func (h *Handler) SubmitContact(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "contact.html", gin.H{
 			"title": "Contact Form",
 			"error": "Please fill in all fields correctly",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -39,7 +36,6 @@ func (h *Handler) SubmitContact(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "contact.html", gin.H{
 			"title": "Contact Form",
 			"error": "Failed to save contact. Email might already exist.",
-			"csrf":  csrf.GetToken(c),
 		})
 		return
 	}
@@ -47,7 +43,6 @@ func (h *Handler) SubmitContact(c *gin.Context) {
 	c.HTML(http.StatusOK, "contact.html", gin.H{
 		"title":   "Contact Form",
 		"success": "Contact saved successfully!",
-		"csrf":    csrf.GetToken(c),
 	})
 }
 
