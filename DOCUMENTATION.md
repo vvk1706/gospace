@@ -128,7 +128,7 @@ gospace/
 - **[k8s-deployment.yaml](k8s-deployment.yaml)** - Kubernetes manifests
   - Namespace
   - Deployment (2 replicas)
-  - NodePort Service (port 30080)
+  - NodePort Service (port 30081)
   - Optional Ingress
 
 ### Source Code
@@ -208,7 +208,7 @@ kubectl get all -n gospace
 kubectl logs -n gospace -l app=gospace -f
 
 # Access application
-open http://localhost:30080
+open http://localhost:30081
 ```
 
 ## Features by Document

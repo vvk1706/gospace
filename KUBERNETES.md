@@ -5,7 +5,7 @@ This guide explains how to deploy GoSpace to Kubernetes using Rancher Desktop or
 ## Overview
 
 The application is deployed using Kubernetes manifests, which include:
-- PostgreSQL StatefulSet with persistent storage ([`k8s-postgres.yaml`](k8s-postgres.yaml))
+- PostgreSQL deployment with persistent storage ([`k8s-postgres.yaml`](k8s-postgres.yaml))
 - Application Deployment with 2 replicas ([`k8s-deployment.yaml`](k8s-deployment.yaml))
 - ConfigMap and Secret for database configuration
 - NodePort service for external access
@@ -23,14 +23,14 @@ The application is deployed using Kubernetes manifests, which include:
 
 ### 1. Build Docker Image
 
-First, build the Docker image in Rancher Desktop's Docker environment:
+First, build the Docker image used by the Kubernetes deployment:
 
 ```bash
-# Build the image
-docker build -t gospace:latest .
+# Build the image referenced by the deployment
+docker build -t gospace-k:latest .
 
 # Verify the image
-docker images | grep gospace
+docker images | grep gospace-k
 ```
 
 ### 2. Deploy to Kubernetes
@@ -69,14 +69,14 @@ kubectl get all -n gospace
 
 ### 3. Access the Application
 
-The application is exposed via NodePort on port 30080:
+The application is exposed via NodePort on port 30081:
 
 ```bash
 # Get the node IP (usually localhost for Rancher Desktop)
 kubectl get nodes -o wide
 
 # Access the application
-open http://localhost:30080
+open http://localhost:30081
 ```
 
 ## Kubernetes Resources
@@ -103,7 +103,7 @@ open http://localhost:30080
 - **Access Mode**: ReadWriteOnce
 - **Storage Class**: local-path (Rancher Desktop default)
 
-#### StatefulSet
+#### Deployment
 - **Name**: `postgres`
 - **Namespace**: `gospace`
 - **Replicas**: 1
@@ -132,8 +132,8 @@ open http://localhost:30080
 - **Name**: `gospace`
 - **Namespace**: `gospace`
 - **Replicas**: 2 (for high availability)
-- **Image**: `gospace:latest`
-- **Image Pull Policy**: `IfNotPresent` (uses local images)
+- **Image**: `gospace-k:latest`
+- **Image Pull Policy**: `Always` in the manifest; for local clusters using locally built images, patch to `IfNotPresent` before restarting
 - **Container Port**: 8080
 - **Environment Variables**:
   - `PORT`: "8080"
@@ -165,8 +165,8 @@ open http://localhost:30080
 - **Selector**: `app: gospace`
 - **Port**: 8080 (internal)
 - **Target Port**: 8080
-- **NodePort**: 30080 (external)
-- **Access**: `http://localhost:30080`
+- **NodePort**: 30081 (external)
+- **Access**: `http://localhost:30081`
 - **Session Affinity**: None
 
 ### Ingress (Optional)
@@ -212,7 +212,10 @@ kubectl get pods -n gospace
 
 ```bash
 # Rebuild image
-docker build -t gospace:latest .
+docker build -t gospace-k:latest .
+
+# For local clusters using the host Docker image cache, switch to IfNotPresent
+kubectl patch deployment gospace -n gospace -p '{"spec":{"template":{"spec":{"containers":[{"name":"gospace","imagePullPolicy":"IfNotPresent"}]}}}}'
 
 # Restart deployment to use new image
 kubectl rollout restart deployment gospace -n gospace
