@@ -29,7 +29,7 @@ spec:
       containers:
       - name: gospace
         image: gospace-k:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: http

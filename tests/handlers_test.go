@@ -207,10 +207,6 @@ func TestListContactsHandler(t *testing.T) {
 
 func TestDuplicateEmailContact(t *testing.T) {
 	db := setupTestDB(t)
-	
-	// Add unique constraint to email field for this test
-	db.Exec("CREATE UNIQUE INDEX idx_contacts_email ON contacts(email)")
-	
 	router := setupRouter(db)
 
 	// First submission
