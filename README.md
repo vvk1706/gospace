@@ -67,7 +67,7 @@ gospace/
 
 - Go 1.21 or higher
 - Git
-- PostgreSQL 15+ (or use Docker/Kubernetes deployment)
+- PostgreSQL 15+ (local install optional if you use the provided Docker or Kubernetes PostgreSQL deployments)
 
 ## Installation
 
@@ -82,8 +82,26 @@ cd gospace
 
 2. **Set up PostgreSQL**
 
-Create a database and update `.env` file:
+Choose one of the following PostgreSQL options, then update [`.env.example`](.env.example) values in your local [`.env`](.env.example) copy if needed:
 
+**Option A: Run PostgreSQL in Docker**
+```bash
+docker run --name gospace-postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=gin_webapp \
+  -p 5432:5432 \
+  -v gospace-postgres-data:/var/lib/postgresql/data \
+  -d postgres:15-alpine
+```
+
+**Option B: Use the project's Docker Compose stack**
+```bash
+cp .env.example .env
+docker-compose up -d postgres
+```
+
+**Option C: Use a local PostgreSQL installation**
 ```bash
 cp .env.example .env
 # Edit .env with your PostgreSQL credentials
@@ -107,24 +125,30 @@ Open your browser and navigate to `http://localhost:8080`
 
 ### Option 2: Docker Compose (Recommended)
 
-The easiest way to run the application with all dependencies:
+The easiest way to run the application with PostgreSQL in a container is to use the included [`docker-compose.yml`](docker-compose.yml):
 
 ```bash
+cp .env.example .env
 ./deploy-docker.sh
 ```
 
 Or manually:
 
 ```bash
+cp .env.example .env
 docker build -t gospace:latest .
 docker-compose up -d
 ```
+
+This starts:
+- a PostgreSQL container on `localhost:5432`
+- the GoSpace application on `http://localhost:8080`
 
 Access at `http://localhost:8080`
 
 ### Option 3: Kubernetes
 
-Deploy to Kubernetes cluster:
+Deploy both PostgreSQL and the application to Kubernetes:
 
 ```bash
 ./deploy-k8s.sh
@@ -133,17 +157,20 @@ Deploy to Kubernetes cluster:
 Or manually:
 
 ```bash
-# Build image
-docker build -t gospace:latest .
+# Build image used by the Kubernetes deployment
+docker build -t gospace-k:latest .
 
-# Deploy PostgreSQL
+# Deploy PostgreSQL inside the cluster
 kubectl apply -f k8s-postgres.yaml
+kubectl wait --for=condition=ready pod -l app=postgres -n gospace --timeout=120s
 
 # Deploy application
 kubectl apply -f k8s-deployment.yaml
 ```
 
-Access via NodePort at `http://localhost:30080`
+The PostgreSQL database runs in-cluster behind the `postgres-service` service and stores data on the [`postgres-pvc`](k8s-postgres.yaml) persistent volume claim.
+
+Access via NodePort at `http://localhost:30081`
 
 ## Usage
 
@@ -214,10 +241,13 @@ go build -o gospace main.go
 
 ### Using Docker Compose (with PostgreSQL)
 
-The project includes a [`docker-compose.yml`](docker-compose.yml) that sets up both the application and PostgreSQL database:
+The project includes a [`docker-compose.yml`](docker-compose.yml) that starts PostgreSQL as a containerized dependency for the application.
 
 ```bash
-# Start all services
+# Create local environment file
+cp .env.example .env
+
+# Start PostgreSQL and the app
 docker-compose up -d
 
 # View logs
@@ -225,6 +255,14 @@ docker-compose logs -f
 
 # Stop services
 docker-compose down
+```
+
+To start only PostgreSQL in Docker and run the app locally with [`main.go`](main.go:13):
+
+```bash
+cp .env.example .env
+docker-compose up -d postgres
+go run main.go
 ```
 
 ### Build Docker Image Only
@@ -236,17 +274,27 @@ docker build -t gospace .
 ### Run with Docker (Standalone)
 
 ```bash
-# Requires external PostgreSQL
+# Start PostgreSQL separately
+docker run --name gospace-postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=gin_webapp \
+  -p 5432:5432 \
+  -v gospace-postgres-data:/var/lib/postgresql/data \
+  -d postgres:15-alpine
+
+# Run the app container against that PostgreSQL instance
 docker run -p 8080:8080 \
   -e DB_HOST=host.docker.internal \
   -e DB_PORT=5432 \
   -e DB_USER=postgres \
   -e DB_PASSWORD=postgres \
-  -e DB_NAME=gospace \
+  -e DB_NAME=gin_webapp \
+  -e DB_SSLMODE=disable \
   gospace
 ```
 
-**Note**: The application requires PostgreSQL. Use Docker Compose for a complete setup with database included.
+**Note**: The application requires PostgreSQL for runtime storage. Use [`docker-compose.yml`](docker-compose.yml) for the simplest containerized setup.
 
 ## Environment Variables
 

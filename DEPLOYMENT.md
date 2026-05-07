@@ -37,9 +37,14 @@ cp .env.example .env
 2. **Build and start services**
 
 ```bash
+cp .env.example .env
 docker build -t gospace:latest .
 docker-compose up -d
 ```
+
+This starts:
+- a PostgreSQL container using the values from [`.env.example`](.env.example)
+- the GoSpace application container connected to that PostgreSQL instance
 
 3. **Verify deployment**
 
@@ -52,6 +57,7 @@ docker-compose logs -f app
 
 - Application: http://localhost:8080
 - PostgreSQL: localhost:5432
+- Database storage: Docker volume `postgres_data`
 
 ### Docker Compose Commands
 
@@ -93,14 +99,21 @@ Use the automated deployment script:
 1. **Build Docker image**
 
 ```bash
-docker build -t gospace:latest .
+docker build -t gospace-k:latest .
 ```
 
-2. **Deploy PostgreSQL**
+2. **Deploy PostgreSQL inside the cluster**
 
 ```bash
 kubectl apply -f k8s-postgres.yaml
 ```
+
+The PostgreSQL manifest creates:
+- a `postgres-config` ConfigMap
+- a `postgres-secret` Secret
+- a `postgres-pvc` PersistentVolumeClaim
+- a `postgres` Deployment
+- a `postgres-service` ClusterIP service
 
 3. **Wait for PostgreSQL to be ready**
 
@@ -123,9 +136,11 @@ kubectl logs -f deployment/gospace -n gospace
 
 6. **Access application**
 
-- NodePort: http://localhost:30080
+- NodePort: http://localhost:30081
 - Port Forward: `kubectl port-forward -n gospace svc/gospace-service 8080:8080`
 - Ingress: http://gospace.local (requires ingress controller)
+
+The application connects to PostgreSQL through the in-cluster `postgres-service` service on port `5432`.
 
 ### Kubernetes Commands
 
@@ -302,9 +317,11 @@ kubectl logs <pod-name> -n gospace
 
 ```bash
 # For local images, ensure imagePullPolicy is IfNotPresent
-# Load image into cluster (for minikube/kind)
-minikube image load gospace:latest
-kind load docker-image gospace:latest
+kubectl patch deployment gospace -n gospace -p '{"spec":{"template":{"spec":{"containers":[{"name":"gospace","imagePullPolicy":"IfNotPresent"}]}}}}'
+
+# Load image into cluster if your runtime does not share the local Docker image store
+minikube image load gospace-k:latest
+kind load docker-image gospace-k:latest
 ```
 
 **Problem**: Database connection fails

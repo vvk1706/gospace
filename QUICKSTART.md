@@ -7,7 +7,7 @@ This guide will help you get GoSpace up and running in **under 2 minutes**.
 - Go 1.21 or higher installed
 - Git
 
-**Database required:** The application uses PostgreSQL for persistent storage.
+**Database required:** The application uses PostgreSQL as its primary runtime database for persistent storage.
 
 ## Quick Setup (2 minutes)
 
@@ -18,36 +18,45 @@ git clone <repository-url>
 cd gospace
 ```
 
-### 2. Set Up Database
+### 2. Set Up PostgreSQL
 
-You have three options:
+You have three supported options:
 
 **Option A: Docker Compose (Recommended)**
 ```bash
+cp .env.example .env
+
 # Start PostgreSQL and application
 docker-compose up -d
 
 # Access at http://localhost:8080
 ```
 
-**Option B: Local PostgreSQL**
+**Option B: PostgreSQL container only**
 ```bash
-# Install PostgreSQL, then create database
-createdb gospace
+cp .env.example .env
+
+docker run --name gospace-postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=gin_webapp \
+  -p 5432:5432 \
+  -v gospace-postgres-data:/var/lib/postgresql/data \
+  -d postgres:15-alpine
+
+go mod download
+go run main.go
+```
+
+**Option C: Local PostgreSQL**
+```bash
+# Install PostgreSQL, then create database if needed
+createdb gin_webapp
 
 # Copy environment file
 cp .env.example .env
 
 # Edit .env with your database credentials
-# Then install dependencies and run
-go mod download
-go run main.go
-```
-
-**Option C: Use SQLite (Development Only)**
-```bash
-# Modify config/database.go to use SQLite
-# Then run
 go mod download
 go run main.go
 ```
@@ -92,7 +101,7 @@ Open your browser and go to `http://localhost:8080`
 
 ### 4. View Contacts
 - Click "View All" or go to `http://localhost:8080/contacts`
-- See all contacts stored in memory
+- See all contacts stored in PostgreSQL
 
 **Note**: Data is stored in PostgreSQL and persists across application restarts.
 
@@ -133,11 +142,27 @@ docker-compose down
 ### Using Docker Only
 
 ```bash
+# Start PostgreSQL in a container
+docker run --name gospace-postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=gin_webapp \
+  -p 5432:5432 \
+  -v gospace-postgres-data:/var/lib/postgresql/data \
+  -d postgres:15-alpine
+
 # Build the image
 docker build -t gospace .
 
-# Run the container
-docker run -p 8080:8080 gospace
+# Run the application container
+docker run -p 8080:8080 \
+  -e DB_HOST=host.docker.internal \
+  -e DB_PORT=5432 \
+  -e DB_USER=postgres \
+  -e DB_PASSWORD=postgres \
+  -e DB_NAME=gin_webapp \
+  -e DB_SSLMODE=disable \
+  gospace
 ```
 
 ## Customization
