@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">GoSpace App</h1>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/contacts">View Contacts</a></li>
+                <li><a href="/agents" class="active">AI Agents</a></li>
+                <li><a href="/tools">AI Tools</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="form-container">
+            <h1>🤖 Add New AI Agent</h1>
+            <p style="color: #666; margin-bottom: 2rem;">Add a new AI agent to the repository</p>
+
+            {{ if .error }}
+            <div class="alert alert-error">
+                {{ .error }}
+            </div>
+            {{ end }}
+
+            <form method="POST" action="/agents/add">
+                <div class="form-group">
+                    <label for="name">Agent Name *</label>
+                    <input type="text" id="name" name="name" required placeholder="e.g., GPT-4 Assistant">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description *</label>
+                    <input type="text" id="description" name="description" required placeholder="Brief description of the agent">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select a category</option>
+                        <option value="Conversational">Conversational</option>
+                        <option value="Code Generation">Code Generation</option>
+                        <option value="Data Analysis">Data Analysis</option>
+                        <option value="Content Creation">Content Creation</option>
+                        <option value="Research">Research</option>
+                        <option value="Automation">Automation</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="version">Version</label>
+                    <input type="text" id="version" name="version" placeholder="e.g., 1.0.0">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" id="author" name="author" placeholder="Author or organization name">
+                </div>
+
+                <div class="form-group">
+                    <label for="repository">Repository URL</label>
+                    <input type="url" id="repository" name="repository" placeholder="https://github.com/user/repo">
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">Tags (comma-separated)</label>
+                    <input type="text" id="tags" name="tags" placeholder="e.g., nlp, chatbot, gpt">
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="active" selected>Active</option>
+                        <option value="experimental">Experimental</option>
+                        <option value="deprecated">Deprecated</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Agent</button>
+                <a href="/agents" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 GoSpace App. Built with Go and Gin Framework.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

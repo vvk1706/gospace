@@ -22,7 +22,7 @@ func main() {
 	log.Println("Connected to PostgreSQL database")
 	
 	// Auto-migrate database schema
-	if err := db.AutoMigrate(&models.Contact{}, &models.CalculatorHistory{}); err != nil {
+	if err := db.AutoMigrate(&models.Contact{}, &models.CalculatorHistory{}, &models.Agent{}, &models.Tool{}); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 	log.Println("Database migration completed")
@@ -48,6 +48,18 @@ func main() {
 	router.GET("/contact", h.ContactForm)
 	router.POST("/contact", h.SubmitContact)
 	router.GET("/contacts", h.ListContacts)
+	
+	// AI Agents routes
+	router.GET("/agents", h.ListAgents)
+	router.GET("/agents/add", h.AddAgentForm)
+	router.POST("/agents/add", h.CreateAgent)
+	router.POST("/agents/:id/delete", h.DeleteAgent)
+	
+	// AI Tools routes
+	router.GET("/tools", h.ListTools)
+	router.GET("/tools/add", h.AddToolForm)
+	router.POST("/tools/add", h.CreateTool)
+	router.POST("/tools/:id/delete", h.DeleteTool)
 
 	// Get port from environment or use default
 	port := os.Getenv("PORT")

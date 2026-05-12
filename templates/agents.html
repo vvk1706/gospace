@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">GoSpace App</h1>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/contacts">View Contacts</a></li>
+                <li><a href="/agents" class="active">AI Agents</a></li>
+                <li><a href="/tools">AI Tools</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="contacts-container">
+            <h1>🤖 AI Agents Repository</h1>
+            <p style="color: #666; margin-bottom: 2rem;">Browse and manage AI agents in the repository</p>
+
+            {{ if .error }}
+            <div class="alert alert-error">
+                {{ .error }}
+            </div>
+            {{ end }}
+
+            <div style="margin-bottom: 2rem;">
+                <a href="/agents/add" class="btn btn-primary">➕ Add New Agent</a>
+            </div>
+
+            {{ if .agents }}
+            <div class="table-container">
+                <table class="contacts-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Version</th>
+                            <th>Author</th>
+                            <th>Status</th>
+                            <th>Tags</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range .agents }}
+                        <tr>
+                            <td><strong>{{ .Name }}</strong></td>
+                            <td>{{ .Description }}</td>
+                            <td><span style="background: #e3f2fd; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">{{ .Category }}</span></td>
+                            <td>{{ .Version }}</td>
+                            <td>{{ .Author }}</td>
+                            <td>
+                                {{ if eq .Status "active" }}
+                                <span style="color: #4caf50;">✓ Active</span>
+                                {{ else if eq .Status "experimental" }}
+                                <span style="color: #ff9800;">⚠ Experimental</span>
+                                {{ else if eq .Status "deprecated" }}
+                                <span style="color: #f44336;">✗ Deprecated</span>
+                                {{ else }}
+                                {{ .Status }}
+                                {{ end }}
+                            </td>
+                            <td style="font-size: 0.85rem; color: #666;">{{ .Tags }}</td>
+                            <td>
+                                {{ if .Repository }}
+                                <a href="{{ .Repository }}" target="_blank" style="color: #4A90E2; text-decoration: none; margin-right: 0.5rem;">🔗</a>
+                                {{ end }}
+                                <form method="POST" action="/agents/{{ .ID }}/delete" style="display: inline;">
+                                    <button type="submit" onclick="return confirm('Are you sure you want to delete this agent?')" style="background: none; border: none; color: #f44336; cursor: pointer; font-size: 1.2rem;">🗑️</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+            {{ else }}
+            <div class="alert alert-info">
+                No agents found. <a href="/agents/add" style="color: #4A90E2;">Add your first agent</a>
+            </div>
+            {{ end }}
+
+            <div class="back-link">
+                <a href="/">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 GoSpace App. Built with Go and Gin Framework.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
