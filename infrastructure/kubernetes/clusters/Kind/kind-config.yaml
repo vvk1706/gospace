@@ -1,0 +1,40 @@
+# Kind cluster configuration with 1 control plane and 4 worker nodes
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: mk
+nodes:
+  # Control plane node
+  - role: control-plane
+    extraPortMappings:
+    - containerPort: 80
+      hostPort: 80
+      protocol: TCP
+    - containerPort: 443
+      hostPort: 443
+      protocol: TCP
+    - containerPort: 30000
+      hostPort: 30000
+      protocol: TCP
+    - containerPort: 30778
+      hostPort: 30778
+      protocol: TCP
+    - containerPort: 30081
+      hostPort: 30081
+      protocol: TCP
+    - containerPort: 30432
+      hostPort: 30432
+      protocol: TCP
+  
+  # Worker node 1
+  - role: worker
+  
+  # Worker node 2
+  - role: worker
+  
+  # Worker node 3
+  - role: worker
+  
+  # Worker node 4
+  - role: worker
+
+# Made with Bob

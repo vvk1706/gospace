@@ -1,0 +1,119 @@
+---
+# Application Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gospace-app
+  labels:
+    name: gospace-app
+
+---
+# DaemonSet
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: gospace
+  namespace: gospace-app
+  labels:
+    app: gospace
+spec:
+  selector:
+    matchLabels:
+      app: gospace
+  template:
+    metadata:
+      labels:
+        app: gospace
+    spec:
+      containers:
+      - name: gospace
+        image: vvk17/gospace:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "8080"
+        - name: DB_HOST
+          value: "postgres-service.gospace-db.svc.cluster.local"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "postgres"
+        - name: DB_NAME
+          value: "gospace"
+        - name: DB_SSLMODE
+          value: "disable"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: gospace-service
+  namespace: gospace-app
+  labels:
+    app: gospace
+spec:
+  type: NodePort
+  selector:
+    app: gospace
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+    nodePort: 30081
+  sessionAffinity: None
+
+---
+# Ingress (Optional - for domain-based access)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gospace-ingress
+  namespace: gospace-app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: gospace.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gospace-service
+            port:
+              number: 8080
+
+# Made with Bob
