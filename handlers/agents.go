@@ -11,7 +11,7 @@ import (
 // ListAgents displays all AI agents
 func (h *Handler) ListAgents(c *gin.Context) {
 	var agents []models.Agent
-	
+
 	if err := h.DB.Order("created_at desc").Find(&agents).Error; err != nil {
 		c.HTML(http.StatusInternalServerError, "agents.html", gin.H{
 			"title": "AI Agents Repository",
@@ -49,6 +49,75 @@ func (h *Handler) CreateAgent(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "add_agent.html", gin.H{
 			"title": "Add AI Agent",
 			"error": "Failed to create agent: " + err.Error(),
+		})
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, "/agents")
+}
+
+// EditAgentForm displays the form to edit an existing agent
+func (h *Handler) EditAgentForm(c *gin.Context) {
+	id := c.Param("id")
+	agentID, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "agents.html", gin.H{
+			"title": "AI Agents Repository",
+			"error": "Invalid agent ID",
+		})
+		return
+	}
+
+	var agent models.Agent
+	if err := h.DB.First(&agent, agentID).Error; err != nil {
+		c.HTML(http.StatusNotFound, "agents.html", gin.H{
+			"title": "AI Agents Repository",
+			"error": "Agent not found",
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "edit_agent.html", gin.H{
+		"title": "Edit AI Agent",
+		"agent": agent,
+	})
+}
+
+// UpdateAgent handles updating an existing agent
+func (h *Handler) UpdateAgent(c *gin.Context) {
+	id := c.Param("id")
+	agentID, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "edit_agent.html", gin.H{
+			"title": "Edit AI Agent",
+			"error": "Invalid agent ID",
+		})
+		return
+	}
+
+	var agent models.Agent
+	if err := h.DB.First(&agent, agentID).Error; err != nil {
+		c.HTML(http.StatusNotFound, "edit_agent.html", gin.H{
+			"title": "Edit AI Agent",
+			"error": "Agent not found",
+		})
+		return
+	}
+
+	if err := c.ShouldBind(&agent); err != nil {
+		c.HTML(http.StatusBadRequest, "edit_agent.html", gin.H{
+			"title": "Edit AI Agent",
+			"error": "Invalid form data: " + err.Error(),
+			"agent": agent,
+		})
+		return
+	}
+
+	if err := h.DB.Save(&agent).Error; err != nil {
+		c.HTML(http.StatusInternalServerError, "edit_agent.html", gin.H{
+			"title": "Edit AI Agent",
+			"error": "Failed to update agent: " + err.Error(),
+			"agent": agent,
 		})
 		return
 	}

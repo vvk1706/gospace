@@ -20,6 +20,7 @@ type Agent struct {
 	Repository  string         `gorm:"size:500" json:"repository" form:"repository"`
 	Tags        string         `gorm:"type:text" json:"tags" form:"tags"`                    // Comma-separated tags
 	Status      string         `gorm:"size:50;default:'active'" json:"status" form:"status"` // active, deprecated, experimental
+	SourceCode  string         `gorm:"type:text" json:"source_code" form:"source_code"`      // Agent source code
 }
 
 // Made with Bob

@@ -21,6 +21,7 @@ type Tool struct {
 	Tags        string         `gorm:"type:text" json:"tags" form:"tags"`                    // Comma-separated tags
 	Language    string         `gorm:"size:50" json:"language" form:"language"`              // Programming language
 	Status      string         `gorm:"size:50;default:'active'" json:"status" form:"status"` // active, deprecated, experimental
+	SourceCode  string         `gorm:"type:text" json:"source_code" form:"source_code"`      // Tool source code
 }
 
 // Made with Bob

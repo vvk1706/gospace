@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">GoSpace App</h1>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/calculator">Calculator</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/contacts">View Contacts</a></li>
+                <li><a href="/agents">AI Agents</a></li>
+                <li><a href="/tools" class="active">AI Tools</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="form-container">
+            <h1>✏️ Edit AI Tool</h1>
+            <p style="color: #666; margin-bottom: 2rem;">Update tool information and source code</p>
+
+            {{ if .error }}
+            <div class="alert alert-error">
+                {{ .error }}
+            </div>
+            {{ end }}
+
+            <form method="POST" action="/tools/{{ .tool.ID }}/edit">
+                <div class="form-group">
+                    <label for="name">Tool Name *</label>
+                    <input type="text" id="name" name="name" required placeholder="e.g., LangChain" value="{{ .tool.Name }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description *</label>
+                    <input type="text" id="description" name="description" required placeholder="Brief description of the tool" value="{{ .tool.Description }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select a category</option>
+                        <option value="Framework" {{ if eq .tool.Category "Framework" }}selected{{ end }}>Framework</option>
+                        <option value="Library" {{ if eq .tool.Category "Library" }}selected{{ end }}>Library</option>
+                        <option value="API" {{ if eq .tool.Category "API" }}selected{{ end }}>API</option>
+                        <option value="CLI Tool" {{ if eq .tool.Category "CLI Tool" }}selected{{ end }}>CLI Tool</option>
+                        <option value="Model" {{ if eq .tool.Category "Model" }}selected{{ end }}>Model</option>
+                        <option value="Dataset" {{ if eq .tool.Category "Dataset" }}selected{{ end }}>Dataset</option>
+                        <option value="Other" {{ if eq .tool.Category "Other" }}selected{{ end }}>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="language">Programming Language</label>
+                    <select id="language" name="language">
+                        <option value="">Select a language</option>
+                        <option value="Python" {{ if eq .tool.Language "Python" }}selected{{ end }}>Python</option>
+                        <option value="JavaScript" {{ if eq .tool.Language "JavaScript" }}selected{{ end }}>JavaScript</option>
+                        <option value="TypeScript" {{ if eq .tool.Language "TypeScript" }}selected{{ end }}>TypeScript</option>
+                        <option value="Go" {{ if eq .tool.Language "Go" }}selected{{ end }}>Go</option>
+                        <option value="Java" {{ if eq .tool.Language "Java" }}selected{{ end }}>Java</option>
+                        <option value="C++" {{ if eq .tool.Language "C++" }}selected{{ end }}>C++</option>
+                        <option value="Rust" {{ if eq .tool.Language "Rust" }}selected{{ end }}>Rust</option>
+                        <option value="Other" {{ if eq .tool.Language "Other" }}selected{{ end }}>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="version">Version</label>
+                    <input type="text" id="version" name="version" placeholder="e.g., 1.0.0" value="{{ .tool.Version }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" id="author" name="author" placeholder="Author or organization name" value="{{ .tool.Author }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="repository">Repository URL</label>
+                    <input type="url" id="repository" name="repository" placeholder="https://github.com/user/repo" value="{{ .tool.Repository }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">Tags (comma-separated)</label>
+                    <input type="text" id="tags" name="tags" placeholder="e.g., llm, embeddings, vector-db" value="{{ .tool.Tags }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="active" {{ if eq .tool.Status "active" }}selected{{ end }}>Active</option>
+                        <option value="experimental" {{ if eq .tool.Status "experimental" }}selected{{ end }}>Experimental</option>
+                        <option value="deprecated" {{ if eq .tool.Status "deprecated" }}selected{{ end }}>Deprecated</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="source_code">Source Code</label>
+                    <textarea id="source_code" name="source_code" rows="15" placeholder="Paste your tool source code here..." style="font-family: 'Courier New', monospace; font-size: 0.9rem;">{{ .tool.SourceCode }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Tool</button>
+                <a href="/tools" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 GoSpace App. Built with Go and Gin Framework.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

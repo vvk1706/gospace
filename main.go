@@ -13,14 +13,14 @@ import (
 func main() {
 	// Load configuration from environment variables
 	cfg := config.LoadConfig()
-	
+
 	// Initialize PostgreSQL database
 	db, err := config.InitDB(cfg)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	log.Println("Connected to PostgreSQL database")
-	
+
 	// Auto-migrate database schema
 	if err := db.AutoMigrate(&models.Contact{}, &models.CalculatorHistory{}, &models.Agent{}, &models.Tool{}); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
@@ -48,17 +48,21 @@ func main() {
 	router.GET("/contact", h.ContactForm)
 	router.POST("/contact", h.SubmitContact)
 	router.GET("/contacts", h.ListContacts)
-	
+
 	// AI Agents routes
 	router.GET("/agents", h.ListAgents)
 	router.GET("/agents/add", h.AddAgentForm)
 	router.POST("/agents/add", h.CreateAgent)
+	router.GET("/agents/:id/edit", h.EditAgentForm)
+	router.POST("/agents/:id/edit", h.UpdateAgent)
 	router.POST("/agents/:id/delete", h.DeleteAgent)
-	
+
 	// AI Tools routes
 	router.GET("/tools", h.ListTools)
 	router.GET("/tools/add", h.AddToolForm)
 	router.POST("/tools/add", h.CreateTool)
+	router.GET("/tools/:id/edit", h.EditToolForm)
+	router.POST("/tools/:id/edit", h.UpdateTool)
 	router.POST("/tools/:id/delete", h.DeleteTool)
 
 	// Get port from environment or use default
@@ -70,7 +74,7 @@ func main() {
 	log.Printf("Starting server on port %s...", port)
 	log.Println("Using PostgreSQL database for persistent storage")
 	log.Printf("Access the application at http://localhost:%s", port)
-	
+
 	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}

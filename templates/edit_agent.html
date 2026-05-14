@@ -23,8 +23,8 @@
 
     <div class="container main-content">
         <div class="form-container">
-            <h1>🤖 Add New AI Agent</h1>
-            <p style="color: #666; margin-bottom: 2rem;">Add a new AI agent to the repository</p>
+            <h1>✏️ Edit AI Agent</h1>
+            <p style="color: #666; margin-bottom: 2rem;">Update agent information and source code</p>
 
             {{ if .error }}
             <div class="alert alert-error">
@@ -32,66 +32,66 @@
             </div>
             {{ end }}
 
-            <form method="POST" action="/agents/add">
+            <form method="POST" action="/agents/{{ .agent.ID }}/edit">
                 <div class="form-group">
                     <label for="name">Agent Name *</label>
-                    <input type="text" id="name" name="name" required placeholder="e.g., GPT-4 Assistant">
+                    <input type="text" id="name" name="name" required placeholder="e.g., GPT-4 Assistant" value="{{ .agent.Name }}">
                 </div>
 
                 <div class="form-group">
                     <label for="description">Description *</label>
-                    <input type="text" id="description" name="description" required placeholder="Brief description of the agent">
+                    <input type="text" id="description" name="description" required placeholder="Brief description of the agent" value="{{ .agent.Description }}">
                 </div>
 
                 <div class="form-group">
                     <label for="category">Category *</label>
                     <select id="category" name="category" required>
                         <option value="">Select a category</option>
-                        <option value="Conversational">Conversational</option>
-                        <option value="Code Generation">Code Generation</option>
-                        <option value="Data Analysis">Data Analysis</option>
-                        <option value="Content Creation">Content Creation</option>
-                        <option value="Research">Research</option>
-                        <option value="Automation">Automation</option>
-                        <option value="Other">Other</option>
+                        <option value="Conversational" {{ if eq .agent.Category "Conversational" }}selected{{ end }}>Conversational</option>
+                        <option value="Code Generation" {{ if eq .agent.Category "Code Generation" }}selected{{ end }}>Code Generation</option>
+                        <option value="Data Analysis" {{ if eq .agent.Category "Data Analysis" }}selected{{ end }}>Data Analysis</option>
+                        <option value="Content Creation" {{ if eq .agent.Category "Content Creation" }}selected{{ end }}>Content Creation</option>
+                        <option value="Research" {{ if eq .agent.Category "Research" }}selected{{ end }}>Research</option>
+                        <option value="Automation" {{ if eq .agent.Category "Automation" }}selected{{ end }}>Automation</option>
+                        <option value="Other" {{ if eq .agent.Category "Other" }}selected{{ end }}>Other</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="version">Version</label>
-                    <input type="text" id="version" name="version" placeholder="e.g., 1.0.0">
+                    <input type="text" id="version" name="version" placeholder="e.g., 1.0.0" value="{{ .agent.Version }}">
                 </div>
 
                 <div class="form-group">
                     <label for="author">Author</label>
-                    <input type="text" id="author" name="author" placeholder="Author or organization name">
+                    <input type="text" id="author" name="author" placeholder="Author or organization name" value="{{ .agent.Author }}">
                 </div>
 
                 <div class="form-group">
                     <label for="repository">Repository URL</label>
-                    <input type="url" id="repository" name="repository" placeholder="https://github.com/user/repo">
+                    <input type="url" id="repository" name="repository" placeholder="https://github.com/user/repo" value="{{ .agent.Repository }}">
                 </div>
 
                 <div class="form-group">
                     <label for="tags">Tags (comma-separated)</label>
-                    <input type="text" id="tags" name="tags" placeholder="e.g., nlp, chatbot, gpt">
+                    <input type="text" id="tags" name="tags" placeholder="e.g., nlp, chatbot, gpt" value="{{ .agent.Tags }}">
                 </div>
 
                 <div class="form-group">
                     <label for="status">Status</label>
                     <select id="status" name="status">
-                        <option value="active" selected>Active</option>
-                        <option value="experimental">Experimental</option>
-                        <option value="deprecated">Deprecated</option>
+                        <option value="active" {{ if eq .agent.Status "active" }}selected{{ end }}>Active</option>
+                        <option value="experimental" {{ if eq .agent.Status "experimental" }}selected{{ end }}>Experimental</option>
+                        <option value="deprecated" {{ if eq .agent.Status "deprecated" }}selected{{ end }}>Deprecated</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="source_code">Source Code</label>
-                    <textarea id="source_code" name="source_code" rows="15" placeholder="Paste your agent source code here..." style="font-family: 'Courier New', monospace; font-size: 0.9rem;"></textarea>
+                    <textarea id="source_code" name="source_code" rows="15" placeholder="Paste your agent source code here..." style="font-family: 'Courier New', monospace; font-size: 0.9rem;">{{ .agent.SourceCode }}</textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Add Agent</button>
+                <button type="submit" class="btn btn-primary">Update Agent</button>
                 <a href="/agents" class="btn btn-secondary">Cancel</a>
             </form>
         </div>

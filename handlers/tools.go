@@ -11,7 +11,7 @@ import (
 // ListTools displays all AI tools
 func (h *Handler) ListTools(c *gin.Context) {
 	var tools []models.Tool
-	
+
 	if err := h.DB.Order("created_at desc").Find(&tools).Error; err != nil {
 		c.HTML(http.StatusInternalServerError, "tools.html", gin.H{
 			"title": "AI Tools Repository",
@@ -49,6 +49,75 @@ func (h *Handler) CreateTool(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "add_tool.html", gin.H{
 			"title": "Add AI Tool",
 			"error": "Failed to create tool: " + err.Error(),
+		})
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, "/tools")
+}
+
+// EditToolForm displays the form to edit an existing tool
+func (h *Handler) EditToolForm(c *gin.Context) {
+	id := c.Param("id")
+	toolID, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "tools.html", gin.H{
+			"title": "AI Tools Repository",
+			"error": "Invalid tool ID",
+		})
+		return
+	}
+
+	var tool models.Tool
+	if err := h.DB.First(&tool, toolID).Error; err != nil {
+		c.HTML(http.StatusNotFound, "tools.html", gin.H{
+			"title": "AI Tools Repository",
+			"error": "Tool not found",
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "edit_tool.html", gin.H{
+		"title": "Edit AI Tool",
+		"tool":  tool,
+	})
+}
+
+// UpdateTool handles updating an existing tool
+func (h *Handler) UpdateTool(c *gin.Context) {
+	id := c.Param("id")
+	toolID, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "edit_tool.html", gin.H{
+			"title": "Edit AI Tool",
+			"error": "Invalid tool ID",
+		})
+		return
+	}
+
+	var tool models.Tool
+	if err := h.DB.First(&tool, toolID).Error; err != nil {
+		c.HTML(http.StatusNotFound, "edit_tool.html", gin.H{
+			"title": "Edit AI Tool",
+			"error": "Tool not found",
+		})
+		return
+	}
+
+	if err := c.ShouldBind(&tool); err != nil {
+		c.HTML(http.StatusBadRequest, "edit_tool.html", gin.H{
+			"title": "Edit AI Tool",
+			"error": "Invalid form data: " + err.Error(),
+			"tool":  tool,
+		})
+		return
+	}
+
+	if err := h.DB.Save(&tool).Error; err != nil {
+		c.HTML(http.StatusInternalServerError, "edit_tool.html", gin.H{
+			"title": "Edit AI Tool",
+			"error": "Failed to update tool: " + err.Error(),
+			"tool":  tool,
 		})
 		return
 	}
