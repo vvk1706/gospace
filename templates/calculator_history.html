@@ -9,20 +9,22 @@
 <body>
     <nav class="navbar">
         <div class="container">
-            <h1 class="logo">GoSpace</h1>
+            <h1 class="logo">GoSpace App</h1>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/calculator">Calculator</a></li>
-                <li><a href="/calculator/history" class="active">History</a></li>
                 <li><a href="/contact">Contact</a></li>
                 <li><a href="/contacts">View Contacts</a></li>
+                <li><a href="/agents">AI Agents</a></li>
+                <li><a href="/tools">AI Tools</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="card">
-            <h2>{{ .title }}</h2>
+    <div class="container main-content">
+        <div class="contacts-container">
+            <h1>Calculator History</h1>
+            <p style="color: #666; margin-bottom: 2rem;">View all your calculation history</p>
             
             {{ if .error }}
             <div class="alert alert-error">{{ .error }}</div>
@@ -30,7 +32,7 @@
 
             {{ if .history }}
             <div class="table-container">
-                <table class="history-table">
+                <table class="contacts-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -51,9 +53,9 @@
                             <td>{{ .Num2 }}</td>
                             <td>{{ .Result }}</td>
                             <td>{{ .CreatedAt.Format "2006-01-02 15:04:05" }}</td>
-                            <td class="action-buttons">
-                                <form method="POST" action="/calculator/history/{{ .ID }}/delete" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this calculation?');">
-                                    <button type="submit" class="btn btn-delete">Delete</button>
+                            <td>
+                                <form method="POST" action="/calculator/history/{{ .ID }}/delete" style="display: inline;">
+                                    <button type="submit" onclick="return confirm('Are you sure you want to delete this calculation?')" style="background: none; border: none; color: #f44336; cursor: pointer; font-size: 1.2rem;">🗑️</button>
                                 </form>
                             </td>
                         </tr>
@@ -62,14 +64,22 @@
                 </table>
             </div>
             {{ else }}
-            <p class="no-data">No calculation history found. Start using the calculator to see your history here!</p>
+            <div class="alert alert-info">
+                No calculation history found. <a href="/calculator" style="color: #4A90E2;">Start using the calculator</a>
+            </div>
             {{ end }}
 
-            <div class="button-group">
-                <a href="/calculator" class="btn btn-primary">Back to Calculator</a>
+            <div class="back-link">
+                <a href="/calculator">← Back to Calculator</a>
             </div>
         </div>
     </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 GoSpace App. Built with Go and Gin Framework.</p>
+        </div>
+    </footer>
 
 </body>
 </html>

@@ -4,12 +4,14 @@ A comprehensive web application built with Go and the Gin framework, featuring a
 
 ## Features
 
-- **Hello World Home Page**: Landing page with navigation to all features
+- **Hello World Home Page**: Landing page with horizontal feature card layout and navigation to all features
 - **Calculator**: Perform basic arithmetic operations (addition, subtraction, multiplication, division)
 - **Calculator History**: View and manage calculation history with delete functionality
 - **Contact Form**: Submit and store contact information (name, surname, email) in PostgreSQL
 - **Contact List**: View all stored contacts from the database
-- **Responsive Design**: Modern, mobile-friendly UI
+- **AI Agents Repository**: Manage AI agents with metadata, source code, and categorization
+- **AI Tools Repository**: Manage AI tools, frameworks, and libraries with detailed information
+- **Modern Responsive UI**: Horizontal layouts, wide forms (1800px), and consistent navigation
 - **No JavaScript**: Pure HTML/CSS with server-side rendering for maximum compatibility and security
 - **PostgreSQL Database**: Persistent storage with GORM ORM
 - **Unique Contact Emails**: Duplicate contact submissions are rejected at the database layer
@@ -26,18 +28,28 @@ gospace/
 │   └── mock_database.go   # Legacy mock database (deprecated)
 ├── models/                 # Data models
 │   ├── contact.go         # Contact model
-│   └── calculator_history.go # Calculator history model
+│   ├── calculator_history.go # Calculator history model
+│   ├── agent.go           # AI Agent model
+│   └── tool.go            # AI Tool model
 ├── handlers/               # HTTP request handlers
 │   ├── handler.go         # Base handler
 │   ├── home.go            # Home page handler
 │   ├── calculator.go      # Calculator handlers
-│   └── contact.go         # Contact form handlers
+│   ├── contact.go         # Contact form handlers
+│   ├── agents.go          # AI Agents handlers
+│   └── tools.go           # AI Tools handlers
 ├── templates/              # HTML templates
 │   ├── home.html          # Home page template
 │   ├── calculator.html    # Calculator page template
 │   ├── calculator_history.html # Calculator history template
 │   ├── contact.html       # Contact form template
-│   └── contacts_list.html # Contacts list template
+│   ├── contacts_list.html # Contacts list template
+│   ├── agents.html        # AI Agents list template
+│   ├── add_agent.html     # Add AI Agent form
+│   ├── edit_agent.html    # Edit AI Agent form
+│   ├── tools.html         # AI Tools list template
+│   ├── add_tool.html      # Add AI Tool form
+│   └── edit_tool.html     # Edit AI Tool form
 ├── static/                 # Static assets
 │   └── css/
 │       └── style.css      # Main stylesheet
@@ -175,7 +187,7 @@ Access via NodePort at `http://localhost:30081`
 ## Usage
 
 ### Home Page
-Navigate to `http://localhost:8080` to see the landing page with links to all features.
+Navigate to `http://localhost:8080` to see the landing page with horizontally arranged feature cards and links to all features.
 
 ### Calculator
 1. Go to `http://localhost:8080/calculator`
@@ -191,7 +203,21 @@ Navigate to `http://localhost:8080` to see the landing page with links to all fe
 3. Click "Submit" to save to the PostgreSQL database
 4. View all contacts at `http://localhost:8080/contacts`
 
-**Note**: Data is stored in PostgreSQL and persists across application restarts.
+### AI Agents Repository
+1. Go to `http://localhost:8080/agents` to view all AI agents
+2. Click "Add New Agent" to create a new agent with metadata and source code
+3. Edit existing agents by clicking the edit icon
+4. Delete agents by clicking the delete icon
+5. View agent details including category, version, author, repository, tags, and status
+
+### AI Tools Repository
+1. Go to `http://localhost:8080/tools` to view all AI tools
+2. Click "Add New Tool" to create a new tool entry
+3. Edit existing tools by clicking the edit icon
+4. Delete tools by clicking the delete icon
+5. View tool details including category, language, version, author, repository, tags, and status
+
+**Note**: All data is stored in PostgreSQL and persists across application restarts.
 
 ## API Endpoints
 
@@ -205,6 +231,18 @@ Navigate to `http://localhost:8080` to see the landing page with links to all fe
 | GET | `/contact` | Contact form page |
 | POST | `/contact` | Submit contact |
 | GET | `/contacts` | List all contacts |
+| GET | `/agents` | List all AI agents |
+| GET | `/agents/add` | Add AI agent form |
+| POST | `/agents/add` | Create new AI agent |
+| GET | `/agents/:id/edit` | Edit AI agent form |
+| POST | `/agents/:id/edit` | Update AI agent |
+| POST | `/agents/:id/delete` | Delete AI agent |
+| GET | `/tools` | List all AI tools |
+| GET | `/tools/add` | Add AI tool form |
+| POST | `/tools/add` | Create new AI tool |
+| GET | `/tools/:id/edit` | Edit AI tool form |
+| POST | `/tools/:id/edit` | Update AI tool |
+| POST | `/tools/:id/delete` | Delete AI tool |
 
 ## Running Tests
 
@@ -365,12 +403,14 @@ Make sure you're running the application from the project root directory where t
 
 ## Project Highlights
 
-- **Zero Configuration**: No database setup required
+- **Modern UI**: Horizontal layouts, wide forms (1800px), and consistent navigation
+- **AI Repository Management**: Manage AI agents and tools with full CRUD operations
 - **Fast Startup**: Application starts in seconds
 - **Complete Test Suite**: All features tested with 100% pass rate
-- **Modern UI**: Responsive design with smooth animations
+- **Responsive Design**: Mobile-friendly with smooth animations
 - **Clean Architecture**: Well-organized code structure
-- **Production Ready**: Includes Dockerfile and build scripts
+- **Production Ready**: Includes Dockerfile, Kubernetes manifests, and deployment scripts
+- **Standardized Deployment**: Single image name (`gospace:latest`) for both Docker and Kubernetes
 
 ## Contributing
 

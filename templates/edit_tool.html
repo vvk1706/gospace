@@ -33,6 +33,7 @@
             {{ end }}
 
             <form method="POST" action="/tools/{{ .tool.ID }}/edit">
+                <div class="form-horizontal">
                 <div class="form-group">
                     <label for="name">Tool Name *</label>
                     <input type="text" id="name" name="name" required placeholder="e.g., LangChain" value="{{ .tool.Name }}">
@@ -100,14 +101,17 @@
                         <option value="deprecated" {{ if eq .tool.Status "deprecated" }}selected{{ end }}>Deprecated</option>
                     </select>
                 </div>
+                </div>
 
-                <div class="form-group">
+                <div class="form-group form-group-full">
                     <label for="source_code">Source Code</label>
                     <textarea id="source_code" name="source_code" rows="15" placeholder="Paste your tool source code here..." style="font-family: 'Courier New', monospace; font-size: 0.9rem;">{{ .tool.SourceCode }}</textarea>
                 </div>
 
+                <div style="margin-top: 1.5rem;">
                 <button type="submit" class="btn btn-primary">Update Tool</button>
                 <a href="/tools" class="btn btn-secondary">Cancel</a>
+                </div>
             </form>
         </div>
     </div>
