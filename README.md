@@ -169,18 +169,20 @@ Deploy both PostgreSQL and the application to Kubernetes:
 Or manually:
 
 ```bash
-# Build image used by the Kubernetes deployment
-docker build -t gospace-k:latest .
+# Build and push image
+docker build -t gospace:latest -t localhost:5000/gospace:latest -t vvk17/gospace:latest .
+docker push localhost:5000/gospace:latest
+docker push vvk17/gospace:latest
 
 # Deploy PostgreSQL inside the cluster
 kubectl apply -f k8s-postgres.yaml
-kubectl wait --for=condition=ready pod -l app=postgres -n gospace --timeout=120s
+kubectl wait --for=condition=ready pod -l app=postgres -n gospace-db --timeout=120s
 
 # Deploy application
 kubectl apply -f k8s-deployment.yaml
 ```
 
-The PostgreSQL database runs in-cluster behind the `postgres-service` service and stores data on the [`postgres-pvc`](k8s-postgres.yaml) persistent volume claim.
+The PostgreSQL database runs in-cluster in the `gospace-db` namespace behind the `postgres-service` service and stores data on the `postgres-pvc` persistent volume claim.
 
 Access via NodePort at `http://localhost:30081`
 
@@ -223,6 +225,7 @@ Navigate to `http://localhost:8080` to see the landing page with horizontally ar
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| GET | `/health` | Health check endpoint |
 | GET | `/` | Home page |
 | GET | `/calculator` | Calculator page |
 | POST | `/calculator` | Calculate result |

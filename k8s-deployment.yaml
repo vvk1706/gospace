@@ -1,23 +1,22 @@
 ---
-# Namespace
+# Application Namespace
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: gospace
+  name: gospace-app
   labels:
-    name: gospace
+    name: gospace-app
 
 ---
-# Deployment
+# DaemonSet
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: gospace
-  namespace: gospace
+  namespace: gospace-app
   labels:
     app: gospace
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: gospace
@@ -28,7 +27,7 @@ spec:
     spec:
       containers:
       - name: gospace
-        image: gospace-k:latest
+        image: vvk17/gospace:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -38,24 +37,15 @@ spec:
         - name: PORT
           value: "8080"
         - name: DB_HOST
-          value: "postgres-service"
+          value: "postgres-service.gospace-db.svc.cluster.local"
         - name: DB_PORT
           value: "5432"
         - name: DB_USER
-          valueFrom:
-            configMapKeyRef:
-              name: postgres-config
-              key: POSTGRES_USER
+          value: "postgres"
         - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: POSTGRES_PASSWORD
+          value: "postgres"
         - name: DB_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: postgres-config
-              key: POSTGRES_DB
+          value: "gospace"
         - name: DB_SSLMODE
           value: "disable"
         resources:
@@ -88,7 +78,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gospace-service
-  namespace: gospace
+  namespace: gospace-app
   labels:
     app: gospace
 spec:
@@ -109,7 +99,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: gospace-ingress
-  namespace: gospace
+  namespace: gospace-app
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
@@ -125,3 +115,5 @@ spec:
             name: gospace-service
             port:
               number: 8080
+
+# Made with Bob

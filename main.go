@@ -39,6 +39,14 @@ func main() {
 	// Initialize handlers
 	h := handlers.NewHandler(db)
 
+	// Health check endpoint
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  "healthy",
+			"service": "gospace",
+		})
+	})
+
 	// Routes
 	router.GET("/", h.Home)
 	router.GET("/calculator", h.Calculator)

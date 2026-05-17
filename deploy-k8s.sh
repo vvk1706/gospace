@@ -29,7 +29,7 @@ echo "🔄 Deploying to Kubernetes..."
 
 # Create namespace and deploy PostgreSQL
 echo "   - Creating namespace and PostgreSQL..."
-kubectl apply -f k8s-postgres-new.yaml
+kubectl apply -f k8s-postgres.yaml
 
 # Wait for PostgreSQL to be ready
 echo "   - Waiting for PostgreSQL to be ready..."
@@ -37,7 +37,7 @@ kubectl wait --for=condition=ready pod -l app=postgres -n gospace-db --timeout=1
 
 # Deploy application
 echo "   - Deploying GoSpace application..."
-kubectl apply -f k8s-deployment-new.yaml
+kubectl apply -f k8s-deployment.yaml
 
 # Wait for application to be ready
 echo "   - Waiting for application to be ready..."

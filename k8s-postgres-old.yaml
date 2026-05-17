@@ -1,19 +1,10 @@
 ---
-# Database Namespace
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: gospace-db
-  labels:
-    name: gospace-db
-
----
 # PostgreSQL ConfigMap
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-config
-  namespace: gospace-db
+  namespace: gospace
   labels:
     app: postgres
 data:
@@ -26,7 +17,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-secret
-  namespace: gospace-db
+  namespace: gospace
   labels:
     app: postgres
 type: Opaque
@@ -39,7 +30,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: gospace-db
+  namespace: gospace
   labels:
     app: postgres
 spec:
@@ -55,7 +46,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: gospace-db
+  namespace: gospace
   labels:
     app: postgres
 spec:
@@ -121,11 +112,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
-  namespace: gospace-db
+  namespace: gospace
   labels:
     app: postgres
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: postgres
   ports:
@@ -133,6 +124,5 @@ spec:
     protocol: TCP
     port: 5432
     targetPort: 5432
-    nodePort: 30432
 
 # Made with Bob

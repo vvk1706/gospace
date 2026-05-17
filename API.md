@@ -4,6 +4,19 @@ This document describes all available API endpoints in GoSpace.
 
 ## Endpoints
 
+### Health Check
+- **URL**: `/health`
+- **Method**: `GET`
+- **Description**: Health check endpoint for monitoring and Kubernetes probes
+- **Response**: JSON
+  ```json
+  {
+    "status": "healthy",
+    "service": "gospace"
+  }
+  ```
+- **Status Code**: `200 OK`
+
 ### Home Page
 - **URL**: `/`
 - **Method**: `GET`
