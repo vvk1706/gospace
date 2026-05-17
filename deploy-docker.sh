@@ -28,7 +28,7 @@ docker build -t gospace:latest .
 
 echo ""
 echo "🔄 Starting services with Docker Compose..."
-docker-compose up -d
+docker compose up -d
 
 echo ""
 echo "⏳ Waiting for services to be ready..."
@@ -38,7 +38,7 @@ echo ""
 echo "✅ Deployment complete!"
 echo ""
 echo "📊 Service Status:"
-docker-compose ps
+docker compose ps
 
 echo ""
 echo "🌐 Application URLs:"
@@ -46,10 +46,10 @@ echo "   - Application: http://localhost:8080"
 echo "   - PostgreSQL: localhost:5432"
 echo ""
 echo "📝 Useful commands:"
-echo "   - View logs: docker-compose logs -f"
-echo "   - Stop services: docker-compose down"
-echo "   - Restart: docker-compose restart"
-echo "   - Remove all: docker-compose down -v"
+echo "   - View logs: docker compose logs -f"
+echo "   - Stop services: docker compose down"
+echo "   - Restart: docker compose restart"
+echo "   - Remove all: docker compose down -v"
 echo ""
 
 # Made with Bob
